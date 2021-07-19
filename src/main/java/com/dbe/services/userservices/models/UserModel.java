@@ -8,17 +8,12 @@ import java.util.List;
  */
 public class UserModel {
     private  Long id;
-    private  String firstName;
-    private  String lastName;
-    private  String username;
+    private  String fullName;
     private  String password;
     private  List<RoleModel> roles;
     private String email;
     private Boolean active;
     private String activeDesc;
-    private String role;
-    private String employeeName;
-    private Long employeeId;
 
     public UserModel() {
     }
@@ -31,27 +26,12 @@ public class UserModel {
         this.id = id;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getPassword() {
@@ -92,29 +72,5 @@ public class UserModel {
 
     public void setActiveDesc(String activeDesc) {
         this.activeDesc = activeDesc;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public String getEmployeeName() {
-        return employeeName;
-    }
-
-    public void setEmployeeName(String employeeName) {
-        this.employeeName = employeeName;
-    }
-
-    public Long getEmployeeId() {
-        return employeeId;
-    }
-
-    public void setEmployeeId(Long employeeId) {
-        this.employeeId = employeeId;
     }
 }

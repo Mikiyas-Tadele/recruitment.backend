@@ -1,7 +1,10 @@
 package com.dbe.domain.vacancy;
 
+import com.dbe.domain.applicant.Application;
+
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "vacancy",schema = "recruitmentDB")
@@ -20,6 +23,8 @@ public class Vacancy {
     private Date postedDate;
     @Column(name="deadline_date")
     private  Date DeadlineDate;
+    @OneToMany(mappedBy = "vacancy")
+    private Set<Application> applications;
 
     public Long getId() {
         return id;
@@ -75,5 +80,13 @@ public class Vacancy {
 
     public void setDeadlineDate(Date deadlineDate) {
         DeadlineDate = deadlineDate;
+    }
+
+    public Set<Application> getApplications() {
+        return applications;
+    }
+
+    public void setApplications(Set<Application> applications) {
+        this.applications = applications;
     }
 }

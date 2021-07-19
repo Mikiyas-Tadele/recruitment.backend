@@ -1,6 +1,7 @@
 package com.dbe.domain.security;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -14,13 +15,11 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "user_sequence")
     @SequenceGenerator(name = "user_sequence",schema = "recruitmentDB",allocationSize =1,sequenceName = "ACCOUNT_ID_SEQ")
     private Long id;
-    private String firstName;
-    private String lastName;
-    private String email;
+    private String fullName;
     private String username;
     private String password;
     private Boolean isActive;
-    private Long lastLoggedIn;
+    private Date lastLoggedIn;
     @ManyToMany(cascade = CascadeType.MERGE,fetch = FetchType.EAGER)
     @JoinTable(name="security_account_role",schema = "recruitmentDB",joinColumns = @JoinColumn(name = "user_id",referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name="role_id",referencedColumnName = "id"))
@@ -32,11 +31,9 @@ public class UserEntity {
     public UserEntity() {
     }
 
-    public UserEntity(String firstName, String lastName, String username,String email, String password, Boolean enabled) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.username = username;
-        this.email = email;
+    public UserEntity(String fullName,String email, String password, Boolean enabled) {
+        this.fullName = fullName;
+        this.username = email;
         this.password = password;
         this.isActive = enabled;
     }
@@ -82,30 +79,6 @@ public class UserEntity {
         this.isActive = enabled;
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public Boolean getActive() {
         return isActive;
     }
@@ -114,12 +87,20 @@ public class UserEntity {
         isActive = active;
     }
 
-    public Long getLastLoggedIn() {
+    public Date getLastLoggedIn() {
         return lastLoggedIn;
     }
 
-    public void setLastLoggedIn(Long lastLoggedIn) {
+    public void setLastLoggedIn(Date lastLoggedIn) {
         this.lastLoggedIn = lastLoggedIn;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 }
 

@@ -14,5 +14,4 @@ public interface UserRepository extends CrudRepository<UserEntity,Long> {
     UserEntity findByUsernameAndPassword(String name, String password);
     Optional<UserEntity> findByUsername(String username);
     Boolean existsByUsername(String username);
-    Boolean existsByEmail(String email);
 }

@@ -14,6 +14,7 @@ import java.util.List;
  */
 public interface UserService {
     UserModel saveUser(UserModel userModel);
+    void registerUser(UserModel userModel);
     List<UserModel> getUsers();
     UserModel getUser(Long id);
     void deleteUser(Long id);

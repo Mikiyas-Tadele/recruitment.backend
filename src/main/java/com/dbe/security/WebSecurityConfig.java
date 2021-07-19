@@ -31,12 +31,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String[] PUBLIC_MATCHERS ={
             "/api/auth/login",
-            "/api/evaluation/evaluatorAssignedForm/",
-            "/api/evaluation/evaluateEmployee/{id}/{score}",
-            "/api/evaluation/getWorkUnitEvalForm/{id}",
-            "/api/evaluation/saveWorkunitEvaluationScore",
-            "/api/evaluation/saveWorkUnitEvaluationAssignedToEvaluator/{evaluatorWorkunitId}"
-//            "/api/auth/create-user"
+             "/api/auth/register-user"
     };
 
     @Autowired

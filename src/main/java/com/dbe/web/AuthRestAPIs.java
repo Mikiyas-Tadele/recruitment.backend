@@ -32,10 +32,15 @@ public class AuthRestAPIs {
     }
 
     @PostMapping("/create-user")
-    public void registerUser(@Valid @RequestBody UserModel userModel) {
+    public void saveUser(@Valid @RequestBody UserModel userModel) {
 
         userService.saveUser(userModel);
 
+    }
+
+    @PostMapping("/register-user")
+    public void registerUser(@RequestBody UserModel userModel){
+        userService.registerUser(userModel);
     }
 
     @GetMapping("/users")

@@ -6,4 +6,5 @@ public class ResourceConstants {
     public static final String SETTING_API = "/api/settings";
     public static final String USER_API = "/api/user";
     public static final String VACANCY_CONTROLLER ="/api/vacancy";
+    public static final String APPLICATION_CONTROLLER="/api/application";
 }

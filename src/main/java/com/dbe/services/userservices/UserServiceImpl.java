@@ -57,18 +57,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserModel saveUser(UserModel userModel) {
         if (userModel.getId() == null) {
-            if (userRepository.existsByUsername(userModel.getUsername())) {
+            if (userRepository.existsByUsername(userModel.getEmail())) {
                 throw new RuntimeException("Fail -> Username is already taken!");
             }
-
-            if (userRepository.existsByEmail(userModel.getEmail())) {
-                throw new RuntimeException("Fail -> Email is already in use!");
-            }
             UserEntity userEntity = new UserEntity();
-            userEntity.setFirstName(userModel.getFirstName());
-            userEntity.setLastName(userModel.getLastName());
-            userEntity.setUsername(userModel.getUsername());
-            userEntity.setEmail(userModel.getEmail());
+            userEntity.setFullName(userModel.getFullName());
+            userEntity.setUsername(userModel.getEmail());
             userEntity.setPassword(passwordEncoder.encode(EvaluationConstants.RESET_PASSWORD));
             userEntity.setActive(userModel.getActive());
             Set<Role> roles = new HashSet<>();
@@ -80,10 +74,8 @@ public class UserServiceImpl implements UserService {
             userModel.setId(userEntity.getId());
         } else {
             UserEntity existingUserEntity = userRepository.findOne(userModel.getId());
-            existingUserEntity.setFirstName(userModel.getFirstName());
-            existingUserEntity.setLastName(userModel.getLastName());
-            existingUserEntity.setUsername(userModel.getUsername());
-            existingUserEntity.setEmail(userModel.getEmail());
+            existingUserEntity.setFullName(userModel.getFullName());
+            existingUserEntity.setUsername(userModel.getEmail());
             existingUserEntity.setActive(userModel.getActive());
             if (userModel.getPassword() != null) {
                 existingUserEntity.setPassword(passwordEncoder.encode(userModel.getPassword()));
@@ -101,7 +93,23 @@ public class UserServiceImpl implements UserService {
         return userModel;
     }
 
-
+    @Override
+    public void registerUser(UserModel userModel) {
+        if (userRepository.existsByUsername(userModel.getEmail())) {
+            throw new RuntimeException("Fail -> Username is already taken!");
+        }
+        UserEntity userEntity = new UserEntity();
+        userEntity.setFullName(userModel.getFullName());
+        userEntity.setUsername(userModel.getEmail());
+        userEntity.setPassword(passwordEncoder.encode(EvaluationConstants.RESET_PASSWORD));
+        userEntity.setActive(userModel.getActive());
+        userEntity.setLastLoggedIn(new Date());
+        Set<Role> roles = new HashSet<>();
+        Role role=new Role();
+        roles.add(roleRepository.findOne(2l));
+        userEntity.setRoles(roles);
+        userRepository.save(userEntity);
+    }
 
     private void getRolesToSave(UserModel userModel, Set<Role> roles) {
         for (RoleModel roleModel : userModel.getRoles()) {
@@ -118,10 +126,8 @@ public class UserServiceImpl implements UserService {
         for (UserEntity userEntity : userRepository.findAll()) {
             UserModel userModel = new UserModel();
             userModel.setId(userEntity.getId());
-            userModel.setFirstName(userEntity.getFirstName());
-            userModel.setLastName(userEntity.getLastName());
-            userModel.setUsername(userEntity.getUsername());
-            userModel.setEmail(userEntity.getEmail());
+            userModel.setFullName(userEntity.getFullName());
+            userModel.setEmail(userEntity.getUsername());
             userModel.setActive(userEntity.getActive());
             userModel.setActiveDesc(userEntity.getActive() != null ? "Active" : "In Active");
             List<RoleModel> roleModels = new ArrayList<>();
@@ -133,7 +139,6 @@ public class UserServiceImpl implements UserService {
                 concatinatedRoles += role.getName().name().replace("ROLE_", "").trim() + ",";
                 roleModels.add(roleModel);
             }
-            userModel.setRole(concatinatedRoles);
 
             userModel.setRoles(roleModels);
 
@@ -149,10 +154,8 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = userRepository.findOne(id);
         UserModel userModel = new UserModel();
         userModel.setId(userEntity.getId());
-        userModel.setFirstName(userEntity.getFirstName());
-        userModel.setLastName(userEntity.getLastName());
-        userModel.setUsername(userEntity.getUsername());
-        userModel.setEmail(userEntity.getEmail());
+        userModel.setEmail(userEntity.getUsername());
+        userModel.setFullName(userEntity.getFullName());
         List<RoleModel> roleModels = new ArrayList<>();
         for (Role role : userEntity.getRoles()) {
             RoleModel roleModel = new RoleModel();
@@ -243,7 +246,7 @@ public class UserServiceImpl implements UserService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = jwtProvider.generateJwtToken(authentication);
-        return new JwtResponse(jwt, princepal.getAuthorities(), princepal.getName(), princepal.getUsername(), princepal.getEmail());
+        return new JwtResponse(jwt, princepal.getAuthorities(), princepal.getName(), princepal.getUsername());
     }
 
     @Override
