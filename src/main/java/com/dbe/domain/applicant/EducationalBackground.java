@@ -15,6 +15,7 @@ public class EducationalBackground {
     private String university;
     @Column(name="YEAR_OF_GRADUATION")
     private String yearOfGraduation;
+    private Double cgpa;
     @ManyToOne
     @JoinColumn(name="applicantId",referencedColumnName = "id")
     private Applicant applicant;
@@ -65,5 +66,13 @@ public class EducationalBackground {
 
     public void setApplicant(Applicant applicant) {
         this.applicant = applicant;
+    }
+
+    public Double getCgpa() {
+        return cgpa;
+    }
+
+    public void setCgpa(Double cgpa) {
+        this.cgpa = cgpa;
     }
 }

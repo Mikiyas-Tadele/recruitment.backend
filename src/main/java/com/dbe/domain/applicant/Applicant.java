@@ -16,10 +16,12 @@ public class Applicant {
     @OneToOne
     @JoinColumn(name = "userId",referencedColumnName = "id")
     private UserEntity userEntity;
+    private String firstName;
+    private String middleName;
+    private String lastName;
     @Column(name="dob")
     private Date dateOfBirth;
     private Long gender;
-    private Double cgpa;
     private Long disability;
     @Column(name="mobilephone1")
     private String mPhone1;
@@ -50,6 +52,30 @@ public class Applicant {
         this.userEntity = userEntity;
     }
 
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getMiddleName() {
+        return middleName;
+    }
+
+    public void setMiddleName(String middleName) {
+        this.middleName = middleName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
     public Date getDateOfBirth() {
         return dateOfBirth;
     }
@@ -64,14 +90,6 @@ public class Applicant {
 
     public void setGender(Long gender) {
         this.gender = gender;
-    }
-
-    public Double getCgpa() {
-        return cgpa;
-    }
-
-    public void setCgpa(Double cgpa) {
-        this.cgpa = cgpa;
     }
 
     public Long getDisability() {

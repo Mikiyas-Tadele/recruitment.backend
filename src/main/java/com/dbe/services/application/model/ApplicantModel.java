@@ -8,6 +8,9 @@ public class ApplicantModel {
 
     private Long id;
     private Long userId;
+    private String firstName;
+    private String middleName;
+    private String lastName;
     private Date dateOfBirth;
     private Long gender;
     private Double cgpa;
@@ -32,6 +35,30 @@ public class ApplicantModel {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getMiddleName() {
+        return middleName;
+    }
+
+    public void setMiddleName(String middleName) {
+        this.middleName = middleName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public Date getDateOfBirth() {

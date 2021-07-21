@@ -8,6 +8,7 @@ public class EducationalBackgroundModel {
     private String university;
     private String yearOfGraduation;
     private Long applicantId;
+    private Double cgpa;
 
     public Long getId() {
         return id;
@@ -63,5 +64,13 @@ public class EducationalBackgroundModel {
 
     public void setApplicantId(Long applicantId) {
         this.applicantId = applicantId;
+    }
+
+    public Double getCgpa() {
+        return cgpa;
+    }
+
+    public void setCgpa(Double cgpa) {
+        this.cgpa = cgpa;
     }
 }

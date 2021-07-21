@@ -1,9 +1,11 @@
 package com.dbe.services.application;
 
 import com.dbe.domain.applicant.Applicant;
+import com.dbe.domain.applicant.ApplicantFile;
 import com.dbe.domain.applicant.EducationalBackground;
 import com.dbe.domain.applicant.WorkExperience;
 import com.dbe.domain.security.UserEntity;
+import com.dbe.repositories.applicant.ApplicantFileRepository;
 import com.dbe.repositories.applicant.ApplicantRepository;
 import com.dbe.repositories.security.UserRepository;
 import com.dbe.security.services.UserPrinciple;
@@ -12,9 +14,13 @@ import com.dbe.services.application.model.EducationalBackgroundModel;
 import com.dbe.services.application.model.WorkExperienceModel;
 import com.dbe.utilities.current_users.AuthenticationFacade;
 import com.dbe.utilities.current_users.IAuthenticationFacade;
+import com.dbe.utilities.file_services.FileModel;
+import com.dbe.utilities.file_services.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -28,6 +34,13 @@ public class ApplicationServiceImpl implements  ApplicationService {
     private UserRepository userRepository;
 
 
+    @Autowired
+    private FileStorageService storageService;
+
+    @Autowired
+    private ApplicantFileRepository applicantFileRepository;
+
+
 
     @Override
     public void addOrCreateApplicant(ApplicantModel applicantModel) {
@@ -39,13 +52,15 @@ public class ApplicationServiceImpl implements  ApplicationService {
             applicant=new Applicant();
             applicant.setUserEntity(userEntity.get());
         }
-        applicant.setCgpa(applicantModel.getCgpa());
         applicant.setDateOfBirth(applicantModel.getDateOfBirth());
         applicant.setDisability(applicantModel.getDisability());
         applicant.setfPhone(applicantModel.getfPhone());
         applicant.setmPhone1(applicantModel.getmPhone1());
         applicant.setmPhone2(applicantModel.getmPhone2());
         applicant.setGender(applicantModel.getGender());
+        applicant.setFirstName(applicantModel.getFirstName());
+        applicant.setMiddleName(applicantModel.getMiddleName());
+        applicant.setLastName(applicantModel.getLastName());
         getEducationalBackgroundSet(applicantModel, applicant);
         getWorkExperiences(applicantModel, applicant);
 
@@ -56,17 +71,20 @@ public class ApplicationServiceImpl implements  ApplicationService {
     @Override
     public ApplicantModel getApplicantModel() {
         IAuthenticationFacade authenticationFacade= new AuthenticationFacade();
-        Authentication authentication=authenticationFacade.getAuthentication();
-        UserEntity userEntity= (UserEntity) authentication.getPrincipal();
-        Applicant applicant=applicantRepository.findApplicantByUserId(userEntity.getId());
+        UserPrinciple authentication= (UserPrinciple) authenticationFacade.getAuthentication().getPrincipal();
+        Optional<UserEntity> userEntity= userRepository.findByUsername(authentication.getUsername());
+
+        Applicant applicant=applicantRepository.findApplicantByUserId(userEntity.get().getId());
         ApplicantModel applicantModel=new ApplicantModel();
-        applicantModel.setCgpa(applicant.getCgpa());
         applicantModel.setDateOfBirth(applicant.getDateOfBirth());
         applicantModel.setDisability(applicant.getDisability());
         applicantModel.setfPhone(applicant.getfPhone());
         applicantModel.setmPhone1(applicant.getmPhone1());
         applicantModel.setmPhone2(applicant.getmPhone2());
         applicantModel.setGender(applicant.getGender());
+        applicantModel.setFirstName(applicant.getFirstName());
+        applicantModel.setMiddleName(applicant.getMiddleName());
+        applicantModel.setLastName(applicant.getLastName());
         List<EducationalBackgroundModel> educationalBackgroundModels=new ArrayList<>();
         for (EducationalBackground educationalBackground:applicant.getEducationalBackgrounds()) {
             EducationalBackgroundModel educationalBackgroundModel=new EducationalBackgroundModel();
@@ -75,6 +93,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
             educationalBackgroundModel.setQualification(educationalBackground.getQualification());
             educationalBackgroundModel.setUniversity(educationalBackground.getUniversity());
             educationalBackgroundModel.setYearOfGraduation(educationalBackground.getYearOfGraduation());
+            educationalBackgroundModel.setCgpa(educationalBackground.getCgpa());
 
             educationalBackgroundModels.add(educationalBackgroundModel);
         }
@@ -97,6 +116,25 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
         return applicantModel;
 
+    }
+
+    @Override
+    public void storeFile(MultipartFile file) {
+        IAuthenticationFacade authenticationFacade= new AuthenticationFacade();
+        UserPrinciple authentication= (UserPrinciple) authenticationFacade.getAuthentication().getPrincipal();
+        Optional<UserEntity> userEntity= userRepository.findByUsername(authentication.getUsername());
+
+        FileModel fileModel = new FileModel();
+        fileModel.setFileName(StringUtils.cleanPath(file.getOriginalFilename()));
+        fileModel.setFileSize(file.getSize());
+
+        storageService.store(file, fileModel);
+        ApplicantFile applicantFile=new ApplicantFile();
+        applicantFile.setFileName(fileModel.getFileName());
+        applicantFile.setFileSize(fileModel.getFileSize());
+        applicantFile.setUserEntity(userEntity.get());
+
+       applicantFileRepository.save(applicantFile);
     }
 
     private void getWorkExperiences(ApplicantModel applicantModel, Applicant applicant) {
@@ -128,6 +166,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
                 educationalBackground.setQualification(educationalBackgroundModel.getQualification());
                 educationalBackground.setUniversity(educationalBackgroundModel.getUniversity());
                 educationalBackground.setYearOfGraduation(educationalBackgroundModel.getYearOfGraduation());
+                educationalBackground.setCgpa(educationalBackgroundModel.getCgpa());
 
                 educationalBackgrounds.add(educationalBackground);
             }
