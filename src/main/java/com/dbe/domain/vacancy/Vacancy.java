@@ -25,6 +25,8 @@ public class Vacancy {
     private  Date DeadlineDate;
     @OneToMany(mappedBy = "vacancy")
     private Set<Application> applications;
+    @OneToMany(mappedBy = "vacancy",cascade = CascadeType.ALL)
+    private Set<VacancyDetail> vacancyDetails;
 
     public Long getId() {
         return id;
@@ -88,5 +90,13 @@ public class Vacancy {
 
     public void setApplications(Set<Application> applications) {
         this.applications = applications;
+    }
+
+    public Set<VacancyDetail> getVacancyDetails() {
+        return vacancyDetails;
+    }
+
+    public void setVacancyDetails(Set<VacancyDetail> vacancyDetails) {
+        this.vacancyDetails = vacancyDetails;
     }
 }

@@ -10,7 +10,7 @@ public class VacancyDetail {
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "vacancy_detail_sequence")
     @SequenceGenerator(name = "vacancy_detail_sequence",schema = "recruitmentDB",allocationSize =1,sequenceName = "VACANCY_detail_ID_SEQ")
     private Long id;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "vacancyId",referencedColumnName = "id")
     private Vacancy vacancy;
     private String title;

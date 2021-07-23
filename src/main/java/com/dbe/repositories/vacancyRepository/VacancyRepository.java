@@ -1,4 +1,4 @@
-package com.dbe.repositories;
+package com.dbe.repositories.vacancyRepository;
 
 
 import com.dbe.domain.vacancy.Vacancy;

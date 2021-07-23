@@ -1,6 +1,8 @@
 package com.dbe.services.vacancy.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class VacancyModel {
     private Long id;
@@ -10,6 +12,7 @@ public class VacancyModel {
     private  String location;
     private  Date postedDate;
     private  Date deadlineDate;
+    private List<VacancyModelDetail> vacancyModelDetailList=new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -65,5 +68,13 @@ public class VacancyModel {
 
     public void setDeadlineDate(Date deadlineDate) {
         this.deadlineDate = deadlineDate;
+    }
+
+    public List<VacancyModelDetail> getVacancyModelDetailList() {
+        return vacancyModelDetailList;
+    }
+
+    public void setVacancyModelDetailList(List<VacancyModelDetail> vacancyModelDetailList) {
+        this.vacancyModelDetailList = vacancyModelDetailList;
     }
 }

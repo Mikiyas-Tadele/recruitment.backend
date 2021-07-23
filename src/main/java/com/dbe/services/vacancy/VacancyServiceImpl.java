@@ -1,8 +1,11 @@
 package com.dbe.services.vacancy;
 
 import com.dbe.domain.vacancy.Vacancy;
-import com.dbe.repositories.VacancyRepository;
+import com.dbe.domain.vacancy.VacancyDetail;
+import com.dbe.repositories.vacancyRepository.VacancyDetailRepository;
+import com.dbe.repositories.vacancyRepository.VacancyRepository;
 import com.dbe.services.vacancy.model.VacancyModel;
+import com.dbe.services.vacancy.model.VacancyModelDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +17,16 @@ public class VacancyServiceImpl implements VacancyService {
 
     @Autowired
     private VacancyRepository vacancyRepository;
+    @Autowired
+    private VacancyDetailRepository vacancyDetailRepository;
 
     @Override
-    public void addOrUpdateVacancy(VacancyModel vacancyModel) {
-      vacancyRepository.save(getVacancyFromModel(vacancyModel));
+    public VacancyModel addOrUpdateVacancyDetail(VacancyModel vacancyModel) {
+        Vacancy vacancy=getVacancyFromModel(vacancyModel);
+      vacancyRepository.save(vacancy);
+
+      return getModelFromVacancyEntity(vacancy);
+
     }
 
     @Override
@@ -68,7 +77,52 @@ public class VacancyServiceImpl implements VacancyService {
         vacancyModel.setPostedDate(vacancy.getPostedDate());
         vacancyModel.setDeadlineDate(vacancy.getDeadlineDate());
         vacancyModel.setLocation(vacancy.getLocation());
+        List<VacancyModelDetail> vacancyModelDetails=new ArrayList<>();
+        for (VacancyDetail vacancyDetail:vacancy.getVacancyDetails()) {
+             VacancyModelDetail vacancyModelDetail=new VacancyModelDetail();
+             vacancyModelDetail.setVacancyId(vacancyDetail.getVacancy().getId());
+             vacancyModelDetail.setTitle(vacancyDetail.getTitle());
+             vacancyModelDetail.setDescription(vacancyDetail.getDescription());
+             vacancyModelDetails.add(vacancyModelDetail);
+        }
+
+        vacancyModel.getVacancyModelDetailList().addAll(vacancyModelDetails);
 
         return vacancyModel;
+    }
+
+    @Override
+    public void addOrUpdateVacancyDetail(VacancyModelDetail vacancyModelDetail) {
+        VacancyDetail vacancyDetail=vacancyModelDetail!=null && vacancyModelDetail.getId()!=null?
+                 vacancyDetailRepository.findOne(vacancyModelDetail.getId()):new VacancyDetail();
+        vacancyDetail.setDescription(vacancyModelDetail.getDescription());
+        vacancyDetail.setTitle(vacancyModelDetail.getTitle());
+        vacancyDetail.setVacancy(vacancyRepository.findOne(vacancyModelDetail.getVacancyId()));
+
+        vacancyDetailRepository.save(vacancyDetail);
+
+    }
+
+    @Override
+    public List<VacancyModelDetail> getAllDetailsForVacancy(Long vacancyId) {
+        List<VacancyModelDetail> vacancyModelDetails=new ArrayList<>();
+        List<VacancyDetail> vacancyDetails=vacancyDetailRepository.findByVacancyId(vacancyId);
+        for (VacancyDetail vacancyDetail:vacancyDetails) {
+            VacancyModelDetail vacancyModelDetail=new VacancyModelDetail();
+            vacancyModelDetail.setDescription(vacancyDetail.getDescription());
+            vacancyModelDetail.setTitle(vacancyDetail.getTitle());
+            vacancyModelDetail.setVacancyId(vacancyDetail.getVacancy().getId());
+
+            vacancyModelDetails.add(vacancyModelDetail);
+        }
+
+        return vacancyModelDetails;
+
+    }
+
+
+    @Override
+    public void deleteVacancyModelDetail(Long id) {
+       vacancyDetailRepository.delete(id);
     }
 }
