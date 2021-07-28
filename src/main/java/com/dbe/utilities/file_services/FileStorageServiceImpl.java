@@ -102,8 +102,25 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
 
     @Override
-    public void delete(Long fileId) {
+    public void delete(Long userId) {
+        ApplicantFile researchFile=applicantFileRepository.findByUserId(userId);
+        try {
+            Path file = rootLocation.resolve(researchFile.getFileName());
+            Resource resource = new UrlResource(file.toUri());
+            if (resource.exists() || resource.isReadable()) {
+                Files.delete(file);
+            }
+            else {
+                throw new StorageFileNotFoundException(
+                        "Could not read file: " + researchFile.getFileName());
 
+            }
+        }
+        catch (MalformedURLException e) {
+            throw new StorageFileNotFoundException("Could not read file: " + researchFile.getFileName(), e);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

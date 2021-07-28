@@ -4,6 +4,7 @@ import com.dbe.domain.applicant.AppliedPersonelView;
 import com.dbe.services.application.ApplicationService;
 import com.dbe.services.application.model.ApplicantModel;
 import com.dbe.services.application.model.ApplicationModel;
+import com.dbe.services.application.model.SearchModel;
 import com.dbe.utilities.exception.StorageException;
 import com.dbe.utilities.file_services.FileModel;
 import com.dbe.utilities.file_services.FileStorageService;
@@ -78,5 +79,10 @@ public class ApplicationController {
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
+    }
+
+    @PostMapping("/search")
+    public List<AppliedPersonelView> advanceSearch(@RequestBody SearchModel searchModel){
+        return  applicationService.advanceSearch(searchModel);
     }
 }

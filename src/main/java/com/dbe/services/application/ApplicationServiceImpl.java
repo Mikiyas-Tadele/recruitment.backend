@@ -9,27 +9,22 @@ import com.dbe.repositories.applicant.AppliedPersonelViewRepository;
 import com.dbe.repositories.security.UserRepository;
 import com.dbe.repositories.vacancyRepository.VacancyRepository;
 import com.dbe.security.services.UserPrinciple;
-import com.dbe.services.application.model.ApplicantModel;
-import com.dbe.services.application.model.ApplicationModel;
-import com.dbe.services.application.model.EducationalBackgroundModel;
-import com.dbe.services.application.model.WorkExperienceModel;
+import com.dbe.services.application.model.*;
 import com.dbe.utilities.current_users.AuthenticationFacade;
 import com.dbe.utilities.current_users.IAuthenticationFacade;
 import com.dbe.utilities.exception.ApplicationException;
 import com.dbe.utilities.file_services.FileModel;
 import com.dbe.utilities.file_services.FileStorageService;
+import com.dbe.utilities.specifications.AppliedPersonelSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.ZoneId;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+
+import static org.springframework.data.jpa.domain.Specifications.where;
 
 @Service
 public class ApplicationServiceImpl implements  ApplicationService {
@@ -148,7 +143,10 @@ public class ApplicationServiceImpl implements  ApplicationService {
         FileModel fileModel = new FileModel();
         fileModel.setFileName(StringUtils.cleanPath(file.getOriginalFilename()));
         fileModel.setFileSize(file.getSize());
-
+        ApplicantFile existingApplicantFile=applicantFileRepository.findByUserId(userEntity.get().getId());
+        if(existingApplicantFile!=null){
+            storageService.delete(userEntity.get().getId());
+        }
         storageService.store(file, fileModel);
         ApplicantFile applicantFile=new ApplicantFile();
         applicantFile.setFileName(fileModel.getFileName());
@@ -162,7 +160,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
         if(applicantModel.getWorkExperiences().size()>0){
             Set<WorkExperience> workExperiences=new HashSet<>();
             for (WorkExperienceModel workExperienceModel:applicantModel.getWorkExperiences()) {
-                WorkExperience workExperience=new WorkExperience();
+                WorkExperience workExperience= workExperienceModel.getId()!=null?applicantRepository.findApplicantWorkExp(workExperienceModel.getId()):new WorkExperience();
                 workExperience.setApplicant(applicant);
                 workExperience.setEndDate(workExperienceModel.getEndDate());
                 workExperience.setSalary(workExperienceModel.getSalary());
@@ -181,14 +179,13 @@ public class ApplicationServiceImpl implements  ApplicationService {
         if(applicantModel.getEducationalBackgrounds().size()>0){
             Set<EducationalBackground> educationalBackgrounds=new HashSet<>();
             for (EducationalBackgroundModel educationalBackgroundModel:applicantModel.getEducationalBackgrounds()) {
-                EducationalBackground educationalBackground=new EducationalBackground();
+                EducationalBackground educationalBackground=educationalBackgroundModel.getId()!=null?applicantRepository.findApplicantEduBkg(educationalBackgroundModel.getId()):new EducationalBackground();
                 educationalBackground.setApplicant(applicant);
                 educationalBackground.setFieldOfEducation(educationalBackgroundModel.getFieldOfEducation());
                 educationalBackground.setQualification(educationalBackgroundModel.getQualification());
                 educationalBackground.setUniversity(educationalBackgroundModel.getUniversity());
                 educationalBackground.setYearOfGraduation(educationalBackgroundModel.getYearOfGraduation());
                 educationalBackground.setCgpa(educationalBackgroundModel.getCgpa());
-
                 educationalBackgrounds.add(educationalBackground);
             }
 
@@ -225,22 +222,17 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
     @Override
     public List<AppliedPersonelView> appliedPersonelForVacancy(Long vacancyId) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
         List<AppliedPersonelView> personelViewList=appliedPersonelViewRepository.findByVacancyId(vacancyId);
 
-        for (AppliedPersonelView appliedPersonelView:personelViewList) {
-            LocalDate endDate=LocalDate.now();
-            LocalDate startDate= LocalDate.from(appliedPersonelView.getDob().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-            Period period=Period.between(startDate,endDate);
-            appliedPersonelView.setAge((long) period.getDays());
-            if(appliedPersonelView.getStartDate()!=null && appliedPersonelView.getEndDate()!=null) {
-                startDate = LocalDate.from(appliedPersonelView.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-                endDate = LocalDate.from(appliedPersonelView.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-                period = Period.between(startDate, endDate);
-                appliedPersonelView.setWorkExperienceInYears((long) period.getYears());
-            }
-        }
-
         return personelViewList;
+    }
+
+    @Override
+    public List<AppliedPersonelView> advanceSearch(SearchModel searchModel) {
+        return appliedPersonelViewRepository.findAll(where(AppliedPersonelSpecification.vacancyPredicate(searchModel.getVacancyId()))
+                .and(AppliedPersonelSpecification.genderPredicate(searchModel.getGender()))
+                .and(AppliedPersonelSpecification.agePredicate(searchModel.getAge(),searchModel.getAgeCriteria()))
+                .and(AppliedPersonelSpecification.workExperiencePredicate(searchModel.getWorkExperience(),searchModel.getWorkExperienceCriteria()))
+                .and(AppliedPersonelSpecification.cgpaPredicate(searchModel.getCgpa(),searchModel.getCgpaCriteria())));
     }
 }

@@ -4,6 +4,7 @@ import com.dbe.domain.security.UserEntity;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -30,9 +31,9 @@ public class Applicant {
     @Column(name="fixedlinephone")
     private String fPhone;
     @OneToMany(mappedBy = "applicant",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    private Set<EducationalBackground> educationalBackgrounds;
+    private Set<EducationalBackground> educationalBackgrounds = new HashSet<>();
     @OneToMany(mappedBy = "applicant",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    private Set<WorkExperience> workExperiences;
+    private Set<WorkExperience> workExperiences = new HashSet<>();
     @OneToMany(mappedBy = "applicant",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private Set<Application> applications;
 

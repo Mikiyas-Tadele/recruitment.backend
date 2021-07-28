@@ -12,7 +12,6 @@ public class AppliedPersonelView {
     private String fullName;
     private String email;
     private Date dob;
-    @Transient
     private Long age;
     private String gender;
     private String disability;
@@ -35,7 +34,6 @@ public class AppliedPersonelView {
     private Date endDate;
     private Long vacancyId;
     private Long userId;
-    @Transient
     private Long workExperienceInYears;
 
     public Long getId() {
