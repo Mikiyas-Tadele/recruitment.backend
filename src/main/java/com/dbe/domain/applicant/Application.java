@@ -23,6 +23,7 @@ public class Application {
     @OneToOne
     @JoinColumn(name="fileId",referencedColumnName = "id")
     private ApplicantFile applicantFile;
+    private String applicationLetter;
 
     public Long getId() {
         return id;
@@ -62,5 +63,13 @@ public class Application {
 
     public void setApplicantFile(ApplicantFile applicantFile) {
         this.applicantFile = applicantFile;
+    }
+
+    public String getApplicationLetter() {
+        return applicationLetter;
+    }
+
+    public void setApplicationLetter(String applicationLetter) {
+        this.applicationLetter = applicationLetter;
     }
 }

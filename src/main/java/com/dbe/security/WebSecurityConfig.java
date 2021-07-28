@@ -31,7 +31,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String[] PUBLIC_MATCHERS ={
             "/api/auth/login",
-             "/api/auth/register-user"
+             "/api/auth/register-user",
+            "/api/vacancy/vacancies",
+            "/api/vacancy/vacancy/{id}"
     };
 
     @Autowired

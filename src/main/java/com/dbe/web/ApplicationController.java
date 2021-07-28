@@ -1,7 +1,9 @@
 package com.dbe.web;
 
+import com.dbe.domain.applicant.AppliedPersonelView;
 import com.dbe.services.application.ApplicationService;
 import com.dbe.services.application.model.ApplicantModel;
+import com.dbe.services.application.model.ApplicationModel;
 import com.dbe.utilities.exception.StorageException;
 import com.dbe.utilities.file_services.FileModel;
 import com.dbe.utilities.file_services.FileStorageService;
@@ -16,7 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -43,6 +47,15 @@ public class ApplicationController {
     public void storeFile(@RequestParam MultipartFile file) {
         applicationService.storeFile(file);
 
+    }
+    @PostMapping("/apply")
+    public void applyForPosition(@RequestBody ApplicationModel applicationModel){
+        applicationService.applyForPosition(applicationModel);
+    }
+
+    @GetMapping("/appliedPersonel/{id}")
+    public List<AppliedPersonelView> getAppliedPersonelForVacancy(@PathVariable Long id) throws ParseException {
+        return applicationService.appliedPersonelForVacancy(id);
     }
     @RequestMapping("/downloadFile")
     public ResponseEntity<Resource> download(@RequestParam Long documentId, HttpServletRequest request) {

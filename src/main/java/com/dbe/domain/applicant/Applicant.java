@@ -21,8 +21,8 @@ public class Applicant {
     private String lastName;
     @Column(name="dob")
     private Date dateOfBirth;
-    private Long gender;
-    private Long disability;
+    private String gender;
+    private String disability;
     @Column(name="mobilephone1")
     private String mPhone1;
     @Column(name="mobilephone2")
@@ -84,19 +84,19 @@ public class Applicant {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public Long getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Long gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 
-    public Long getDisability() {
+    public String getDisability() {
         return disability;
     }
 
-    public void setDisability(Long disability) {
+    public void setDisability(String disability) {
         this.disability = disability;
     }
 

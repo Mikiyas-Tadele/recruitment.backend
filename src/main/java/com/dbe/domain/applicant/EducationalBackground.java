@@ -11,7 +11,7 @@ public class EducationalBackground {
     private Long id;
     @Column(name="FIELD_OF_EDUCATION")
     private String fieldOfEducation;
-    private Long qualification;
+    private String qualification;
     private String university;
     @Column(name="YEAR_OF_GRADUATION")
     private String yearOfGraduation;
@@ -36,11 +36,11 @@ public class EducationalBackground {
         this.fieldOfEducation = fieldOfEducation;
     }
 
-    public Long getQualification() {
+    public String getQualification() {
         return qualification;
     }
 
-    public void setQualification(Long qualification) {
+    public void setQualification(String qualification) {
         this.qualification = qualification;
     }
 

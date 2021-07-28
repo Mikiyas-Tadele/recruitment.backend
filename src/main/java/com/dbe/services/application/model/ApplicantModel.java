@@ -12,9 +12,9 @@ public class ApplicantModel {
     private String middleName;
     private String lastName;
     private Date dateOfBirth;
-    private Long gender;
+    private String gender;
     private Double cgpa;
-    private Long disability;
+    private String disability;
     private String mPhone1;
     private String mPhone2;
     private String fPhone;
@@ -69,11 +69,11 @@ public class ApplicantModel {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public Long getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Long gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 
@@ -85,11 +85,11 @@ public class ApplicantModel {
         this.cgpa = cgpa;
     }
 
-    public Long getDisability() {
+    public String getDisability() {
         return disability;
     }
 
-    public void setDisability(Long disability) {
+    public void setDisability(String disability) {
         this.disability = disability;
     }
 
