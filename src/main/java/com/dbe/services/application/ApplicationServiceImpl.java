@@ -57,7 +57,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
     public void addOrCreateApplicant(ApplicantModel applicantModel) {
         IAuthenticationFacade authenticationFacade= new AuthenticationFacade();
         UserPrinciple authentication= (UserPrinciple) authenticationFacade.getAuthentication().getPrincipal();
-        Optional<UserEntity> userEntity= userRepository.findByUsername(authentication.getUsername());
+        Optional<UserEntity> userEntity= userRepository.findByUsernameAndEnabled(authentication.getUsername(),true);
         Applicant applicant=applicantRepository.findApplicantByUserId(userEntity.get().getId());
         if(applicant==null){
             applicant=new Applicant();
@@ -83,7 +83,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
     public ApplicantModel getApplicantModel() {
         IAuthenticationFacade authenticationFacade= new AuthenticationFacade();
         UserPrinciple authentication= (UserPrinciple) authenticationFacade.getAuthentication().getPrincipal();
-        Optional<UserEntity> userEntity= userRepository.findByUsername(authentication.getUsername());
+        Optional<UserEntity> userEntity= userRepository.findByUsernameAndEnabled(authentication.getUsername(),true);
 
         Applicant applicant=applicantRepository.findApplicantByUserId(userEntity.get().getId());
         ApplicantModel applicantModel = new ApplicantModel();
@@ -138,7 +138,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
     public void storeFile(MultipartFile file) {
         IAuthenticationFacade authenticationFacade= new AuthenticationFacade();
         UserPrinciple authentication= (UserPrinciple) authenticationFacade.getAuthentication().getPrincipal();
-        Optional<UserEntity> userEntity= userRepository.findByUsername(authentication.getUsername());
+        Optional<UserEntity> userEntity= userRepository.findByUsernameAndEnabled(authentication.getUsername(),true);
 
         FileModel fileModel = new FileModel();
         fileModel.setFileName(StringUtils.cleanPath(file.getOriginalFilename()));
@@ -197,7 +197,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
     public void applyForPosition(ApplicationModel model) {
         IAuthenticationFacade authenticationFacade= new AuthenticationFacade();
         UserPrinciple authentication= (UserPrinciple) authenticationFacade.getAuthentication().getPrincipal();
-        Optional<UserEntity> userEntity= userRepository.findByUsername(authentication.getUsername());
+        Optional<UserEntity> userEntity= userRepository.findByUsernameAndEnabled(authentication.getUsername(),true);
         Applicant applicant=applicantRepository.findApplicantByUserId(userEntity.get().getId());
 
          if(applicant==null){

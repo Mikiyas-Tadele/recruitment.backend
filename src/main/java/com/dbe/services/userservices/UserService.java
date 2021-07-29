@@ -7,6 +7,8 @@ import com.dbe.services.userservices.models.PermissionModel;
 import com.dbe.services.userservices.models.RoleModel;
 import com.dbe.services.userservices.models.UserModel;
 
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
@@ -14,7 +16,8 @@ import java.util.List;
  */
 public interface UserService {
     UserModel saveUser(UserModel userModel);
-    void registerUser(UserModel userModel);
+    void registerUser(UserModel userModel) throws UnsupportedEncodingException, MessagingException;
+    void verifyUser(String token);
     List<UserModel> getUsers();
     UserModel getUser(Long id);
     void deleteUser(Long id);

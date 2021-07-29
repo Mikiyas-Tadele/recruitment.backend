@@ -6,12 +6,15 @@ import com.dbe.services.userservices.models.PermissionModel;
 import com.dbe.services.userservices.models.RoleModel;
 import com.dbe.services.userservices.models.UserModel;
 import com.dbe.security.JwtResponse;
+import org.jboss.logging.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -39,9 +42,15 @@ public class AuthRestAPIs {
     }
 
     @PostMapping("/register-user")
-    public void registerUser(@RequestBody UserModel userModel){
+    public void registerUser(@RequestBody UserModel userModel) throws UnsupportedEncodingException, MessagingException {
         userService.registerUser(userModel);
     }
+
+    @GetMapping("/verify/{id}")
+    public void VerifyLink(@PathVariable String id){
+        userService.verifyUser(id);
+    }
+
 
     @GetMapping("/users")
     public List<UserModel> getUsers(){

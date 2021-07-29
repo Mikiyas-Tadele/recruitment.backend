@@ -21,6 +21,8 @@ public class UserPrinciple implements UserDetails {
 
     private String username;
 
+    private Boolean enabled;
+
     @JsonIgnore
     private String password;
 
@@ -28,13 +30,14 @@ public class UserPrinciple implements UserDetails {
 
 
     public UserPrinciple(Long id, String name,
-                         String email, String password,
+                         String email, String password,Boolean enabled,
                          Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.name = name;
         this.username = email;
         this.password = password;
         this.authorities = authorities;
+        this.enabled=enabled;
 
     }
 
@@ -49,6 +52,7 @@ public class UserPrinciple implements UserDetails {
                 userEntity.getFullName(),
                 userEntity.getUsername(),
                 userEntity.getPassword(),
+                userEntity.getEnabled(),
                 authorities
         );
     }
@@ -94,7 +98,7 @@ public class UserPrinciple implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 
 

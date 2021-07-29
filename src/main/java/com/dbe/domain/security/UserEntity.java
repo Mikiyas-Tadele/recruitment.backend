@@ -18,7 +18,7 @@ public class UserEntity {
     private String fullName;
     private String username;
     private String password;
-    private Boolean isActive;
+    private Boolean enabled;
     private Date lastLoggedIn;
     @ManyToMany(cascade = CascadeType.MERGE,fetch = FetchType.EAGER)
     @JoinTable(name="security_account_role",schema = "recruitmentDB",joinColumns = @JoinColumn(name = "user_id",referencedColumnName = "id"),
@@ -35,7 +35,7 @@ public class UserEntity {
         this.fullName = fullName;
         this.username = email;
         this.password = password;
-        this.isActive = enabled;
+        this.enabled = enabled;
     }
 
     public void setRoles(Set<Role> roles) {
@@ -72,19 +72,11 @@ public class UserEntity {
     }
 
     public Boolean getEnabled() {
-        return isActive;
+        return enabled;
     }
 
     public void setEnabled(Boolean enabled) {
-        this.isActive = enabled;
-    }
-
-    public Boolean getActive() {
-        return isActive;
-    }
-
-    public void setActive(Boolean active) {
-        isActive = active;
+        this.enabled = enabled;
     }
 
     public Date getLastLoggedIn() {

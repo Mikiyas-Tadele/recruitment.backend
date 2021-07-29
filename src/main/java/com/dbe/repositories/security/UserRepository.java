@@ -12,6 +12,6 @@ import java.util.Optional;
 public interface UserRepository extends CrudRepository<UserEntity,Long> {
     //UserEntity findByUsername(String name);
     UserEntity findByUsernameAndPassword(String name, String password);
-    Optional<UserEntity> findByUsername(String username);
+    Optional<UserEntity> findByUsernameAndEnabled(String username,Boolean enabled);
     Boolean existsByUsername(String username);
 }

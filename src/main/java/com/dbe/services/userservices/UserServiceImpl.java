@@ -3,16 +3,21 @@ package com.dbe.services.userservices;
 import com.dbe.domain.security.Role;
 import com.dbe.domain.security.RoleName;
 import com.dbe.domain.security.UserEntity;
+import com.dbe.domain.security.VerificationToken;
 import com.dbe.model.LoginModel;
 import com.dbe.repositories.security.RoleRepository;
 import com.dbe.repositories.security.UserRepository;
+import com.dbe.repositories.security.VerificationTokenRepository;
 import com.dbe.security.JwtResponse;
 import com.dbe.security.jwt.JwtProvider;
 import com.dbe.security.services.UserPrinciple;
 import com.dbe.services.userservices.models.RoleModel;
 import com.dbe.services.userservices.models.UserModel;
-import com.dbe.utilities.models.EvaluationConstants;
+import com.dbe.utilities.exception.ApplicationException;
+import com.dbe.utilities.models.SystemConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,6 +26,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.io.UnsupportedEncodingException;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.TemporalUnit;
 import java.util.*;
 
 /**
@@ -41,6 +52,13 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     JwtProvider jwtProvider;
+
+    @Autowired
+    JavaMailSender javaMailSender;
+
+    @Autowired
+    private VerificationTokenRepository verificationTokenRepository;
+
 
 
     @Autowired
@@ -63,8 +81,7 @@ public class UserServiceImpl implements UserService {
             UserEntity userEntity = new UserEntity();
             userEntity.setFullName(userModel.getFullName());
             userEntity.setUsername(userModel.getEmail());
-            userEntity.setPassword(passwordEncoder.encode(EvaluationConstants.RESET_PASSWORD));
-            userEntity.setActive(userModel.getActive());
+            userEntity.setPassword(passwordEncoder.encode(SystemConstants.RESET_PASSWORD));
             Set<Role> roles = new HashSet<>();
             if (userModel.getRoles() != null) {
                 getRolesToSave(userModel, roles);
@@ -76,7 +93,6 @@ public class UserServiceImpl implements UserService {
             UserEntity existingUserEntity = userRepository.findOne(userModel.getId());
             existingUserEntity.setFullName(userModel.getFullName());
             existingUserEntity.setUsername(userModel.getEmail());
-            existingUserEntity.setActive(userModel.getActive());
             if (userModel.getPassword() != null) {
                 existingUserEntity.setPassword(passwordEncoder.encode(userModel.getPassword()));
             }
@@ -94,21 +110,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void registerUser(UserModel userModel) {
+    public void registerUser(UserModel userModel) throws UnsupportedEncodingException, MessagingException {
         if (userRepository.existsByUsername(userModel.getEmail())) {
             throw new RuntimeException("Fail -> Username is already taken!");
         }
         UserEntity userEntity = new UserEntity();
         userEntity.setFullName(userModel.getFullName());
         userEntity.setUsername(userModel.getEmail());
-        userEntity.setPassword(passwordEncoder.encode(EvaluationConstants.RESET_PASSWORD));
-        userEntity.setActive(userModel.getActive());
+        userEntity.setPassword(passwordEncoder.encode(SystemConstants.RESET_PASSWORD));
+        userEntity.setEnabled(false);
         userEntity.setLastLoggedIn(new Date());
         Set<Role> roles = new HashSet<>();
         Role role=new Role();
         roles.add(roleRepository.findOne(2l));
         userEntity.setRoles(roles);
         userRepository.save(userEntity);
+
+        sendVerificationEmail(userEntity);
     }
 
     private void getRolesToSave(UserModel userModel, Set<Role> roles) {
@@ -128,8 +146,6 @@ public class UserServiceImpl implements UserService {
             userModel.setId(userEntity.getId());
             userModel.setFullName(userEntity.getFullName());
             userModel.setEmail(userEntity.getUsername());
-            userModel.setActive(userEntity.getActive());
-            userModel.setActiveDesc(userEntity.getActive() != null ? "Active" : "In Active");
             List<RoleModel> roleModels = new ArrayList<>();
             String concatinatedRoles = "";
             for (Role role : userEntity.getRoles()) {
@@ -176,7 +192,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserModel getUserByName(String username) {
-        Optional<UserEntity> userEntity = userRepository.findByUsername(username);
+        Optional<UserEntity> userEntity = userRepository.findByUsernameAndEnabled(username,true);
         if (userEntity.isPresent()) {
             return getUser(userEntity.get().getId());
         }
@@ -241,22 +257,89 @@ public class UserServiceImpl implements UserService {
                 )
         );
 
-        UserPrinciple princepal = (UserPrinciple) authentication.getPrincipal();
+        UserPrinciple principal = (UserPrinciple) authentication.getPrincipal();
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = jwtProvider.generateJwtToken(authentication);
-        return new JwtResponse(jwt, princepal.getAuthorities(), princepal.getName(), princepal.getUsername());
+        return new JwtResponse(jwt, principal.getAuthorities(), principal.getName(), principal.getUsername());
     }
 
     @Override
     public void restPassword(String username) {
-        Optional<UserEntity> userEntityOpt=userRepository.findByUsername(username);
+        Optional<UserEntity> userEntityOpt=userRepository.findByUsernameAndEnabled(username,true);
         if(userEntityOpt.isPresent()){
             UserEntity userEntity=userEntityOpt.get();
-            userEntity.setPassword(passwordEncoder.encode(EvaluationConstants.RESET_PASSWORD));
+            userEntity.setPassword(passwordEncoder.encode(SystemConstants.RESET_PASSWORD));
 
             userRepository.save(userEntity);
         }
+    }
+
+    @Override
+    public void verifyUser(String token) {
+        VerificationToken verificationToken=verificationTokenRepository.findByToken(token);
+        if(verificationToken!=null){
+          LocalDate localDate=verificationToken.getExpiryDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+          if(!LocalDate.now().isAfter(localDate)){
+              UserEntity userEntity=verificationToken.getUserEntity();
+              userEntity.setEnabled(true);
+              userRepository.save(userEntity);
+              verificationTokenRepository.delete(verificationToken.getId());
+          }
+          else{
+              UserEntity userEntity=verificationToken.getUserEntity();
+              userRepository.delete(userEntity.getId());
+              verificationTokenRepository.delete(verificationToken.getId());
+              throw new ApplicationException("Yours Verification Link is expired");
+          }
+        }
+        else{
+            throw new ApplicationException("Yours Verification Link does not exist");
+        }
+    }
+
+    private VerificationToken generateAndStoreVerificationToken(UserEntity userEntity){
+        VerificationToken verificationToken=new VerificationToken();
+        String token = UUID.randomUUID().toString();
+        verificationToken.setExpiryDate(Date.from(LocalDate.now().plusDays(1).
+                atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        verificationToken.setToken(token);
+        verificationToken.setUserEntity(userEntity);
+
+        verificationTokenRepository.save(verificationToken);
+
+        return verificationToken;
+
+    }
+
+    private void sendVerificationEmail(UserEntity  userEntity) throws UnsupportedEncodingException, MessagingException {
+        VerificationToken verificationToken=generateAndStoreVerificationToken(userEntity);
+        String toAddress = userEntity.getUsername();
+        String fromAddress = "hrm@dbe.com.et";
+        String senderName = "DBE Recruitment Team";
+        String subject = "Please verify your registration";
+        String content = "Dear [[name]],<br>"
+                + "Please click the link below to verify your registration:<br>"
+                + "<h4><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h4>"
+                + "Thank you,<br>"
+                + "Human Resource Management Directorate, <br>"
+                + "Development Bank of Ethiopia";
+
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+
+        helper.setFrom(fromAddress, senderName);
+        helper.setTo(toAddress);
+        helper.setSubject(subject);
+
+        content = content.replace("[[name]]", userEntity.getFullName());
+        String verifyURL = SystemConstants.VERIFICATION_URL + verificationToken.getToken();
+
+        content = content.replace("[[URL]]", verifyURL);
+
+        helper.setText(content, true);
+
+        javaMailSender.send(message);
     }
 }
