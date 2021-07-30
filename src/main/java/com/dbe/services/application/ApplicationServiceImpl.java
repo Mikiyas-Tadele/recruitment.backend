@@ -2,14 +2,12 @@ package com.dbe.services.application;
 
 import com.dbe.domain.applicant.*;
 import com.dbe.domain.security.UserEntity;
-import com.dbe.repositories.applicant.ApplicantFileRepository;
-import com.dbe.repositories.applicant.ApplicantRepository;
-import com.dbe.repositories.applicant.ApplicationRepository;
-import com.dbe.repositories.applicant.AppliedPersonelViewRepository;
+import com.dbe.repositories.applicant.*;
 import com.dbe.repositories.security.UserRepository;
 import com.dbe.repositories.vacancyRepository.VacancyRepository;
 import com.dbe.security.services.UserPrinciple;
 import com.dbe.services.application.model.*;
+import com.dbe.services.settings.SettingService;
 import com.dbe.utilities.current_users.AuthenticationFacade;
 import com.dbe.utilities.current_users.IAuthenticationFacade;
 import com.dbe.utilities.exception.ApplicationException;
@@ -50,6 +48,12 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
     @Autowired
     private AppliedPersonelViewRepository appliedPersonelViewRepository;
+
+    @Autowired
+    private AppliedJobViewRepository appliedJobViewRepository;
+
+    @Autowired
+    private SettingService settingService;
 
 
 
@@ -103,7 +107,9 @@ public class ApplicationServiceImpl implements  ApplicationService {
                 EducationalBackgroundModel educationalBackgroundModel = new EducationalBackgroundModel();
                 educationalBackgroundModel.setApplicantId(applicant.getId());
                 educationalBackgroundModel.setFieldOfEducation(educationalBackground.getFieldOfEducation());
+                educationalBackgroundModel.setSpecialization(educationalBackground.getSpecialization());
                 educationalBackgroundModel.setQualification(educationalBackground.getQualification());
+                educationalBackgroundModel.setQualificationDesc(settingService.getDescription(educationalBackground.getQualification()));
                 educationalBackgroundModel.setUniversity(educationalBackground.getUniversity());
                 educationalBackgroundModel.setYearOfGraduation(educationalBackground.getYearOfGraduation());
                 educationalBackgroundModel.setCgpa(educationalBackground.getCgpa());
@@ -135,7 +141,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
     }
 
     @Override
-    public void storeFile(MultipartFile file) {
+    public void storeFile(MultipartFile file, Long fileTypeId) {
         IAuthenticationFacade authenticationFacade= new AuthenticationFacade();
         UserPrinciple authentication= (UserPrinciple) authenticationFacade.getAuthentication().getPrincipal();
         Optional<UserEntity> userEntity= userRepository.findByUsernameAndEnabled(authentication.getUsername(),true);
@@ -143,9 +149,9 @@ public class ApplicationServiceImpl implements  ApplicationService {
         FileModel fileModel = new FileModel();
         fileModel.setFileName(StringUtils.cleanPath(file.getOriginalFilename()));
         fileModel.setFileSize(file.getSize());
-        ApplicantFile existingApplicantFile=applicantFileRepository.findByUserId(userEntity.get().getId());
+        ApplicantFile existingApplicantFile=applicantFileRepository.findByUserId(userEntity.get().getId(),fileTypeId);
         if(existingApplicantFile!=null){
-            storageService.delete(userEntity.get().getId());
+            storageService.delete(userEntity.get().getId(),fileTypeId );
         }
         storageService.store(file, fileModel);
         ApplicantFile applicantFile=new ApplicantFile();
@@ -185,6 +191,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
                 educationalBackground.setQualification(educationalBackgroundModel.getQualification());
                 educationalBackground.setUniversity(educationalBackgroundModel.getUniversity());
                 educationalBackground.setYearOfGraduation(educationalBackgroundModel.getYearOfGraduation());
+                educationalBackground.setSpecialization(educationalBackgroundModel.getSpecialization());
                 educationalBackground.setCgpa(educationalBackgroundModel.getCgpa());
                 educationalBackgrounds.add(educationalBackground);
             }
@@ -214,6 +221,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
          application.setVacancy(vacancyRepository.findOne(model.getVacancyId()));
          application.setApplicationLetter(model.getApplicationLetter());
          application.setAppliedDate(new Date());
+         application.setStatus(11l);
 
          applicationRepository.save(application);
 
@@ -234,5 +242,14 @@ public class ApplicationServiceImpl implements  ApplicationService {
                 .and(AppliedPersonelSpecification.agePredicate(searchModel.getAge(),searchModel.getAgeCriteria()))
                 .and(AppliedPersonelSpecification.workExperiencePredicate(searchModel.getWorkExperience(),searchModel.getWorkExperienceCriteria()))
                 .and(AppliedPersonelSpecification.cgpaPredicate(searchModel.getCgpa(),searchModel.getCgpaCriteria())));
+    }
+
+    @Override
+    public List<AppliedJobView> getAppliedJobs() {
+        IAuthenticationFacade authenticationFacade= new AuthenticationFacade();
+        UserPrinciple authentication= (UserPrinciple) authenticationFacade.getAuthentication().getPrincipal();
+        Optional<UserEntity> userEntity= userRepository.findByUsernameAndEnabled(authentication.getUsername(),true);
+
+        return appliedJobViewRepository.findByUserId(userEntity.get().getId()) ;
     }
 }

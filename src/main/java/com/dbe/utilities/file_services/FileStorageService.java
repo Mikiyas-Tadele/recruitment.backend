@@ -14,9 +14,9 @@ public interface FileStorageService {
 
     FileModel load(Long fileId);
 
-    Resource loadAsResource(Long fileId);
+    Resource loadAsResource(Long fileId, Long fileTypeId);
 
-    void delete(Long fileId);
+    void delete(Long fileId, Long fileTypeId);
 
     void editFileDescription(Long fileId, String description);
 

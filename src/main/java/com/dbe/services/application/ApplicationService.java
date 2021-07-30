@@ -1,5 +1,6 @@
 package com.dbe.services.application;
 
+import com.dbe.domain.applicant.AppliedJobView;
 import com.dbe.domain.applicant.AppliedPersonelView;
 import com.dbe.services.application.model.ApplicantModel;
 import com.dbe.services.application.model.ApplicationModel;
@@ -15,12 +16,14 @@ public interface ApplicationService {
 
     ApplicantModel getApplicantModel();
 
-    void storeFile(MultipartFile file);
+    void storeFile(MultipartFile file, Long fileTypeId);
 
     void applyForPosition(ApplicationModel model);
 
     List<AppliedPersonelView> appliedPersonelForVacancy(Long vacancyId) throws ParseException;
 
     List<AppliedPersonelView> advanceSearch(SearchModel searchModel);
+
+    List<AppliedJobView> getAppliedJobs();
 
 }

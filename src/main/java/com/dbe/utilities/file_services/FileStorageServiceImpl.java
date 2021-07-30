@@ -81,9 +81,9 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
 
     @Override
-    public Resource loadAsResource(Long userId) {
+    public Resource loadAsResource(Long userId, Long fileTypeId) {
 
-        ApplicantFile researchFile=applicantFileRepository.findByUserId(userId);
+        ApplicantFile researchFile=applicantFileRepository.findByUserId(userId,fileTypeId);
         try {
             Path file = rootLocation.resolve(researchFile.getFileName());
             Resource resource = new UrlResource(file.toUri());
@@ -102,8 +102,8 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
 
     @Override
-    public void delete(Long userId) {
-        ApplicantFile researchFile=applicantFileRepository.findByUserId(userId);
+    public void delete(Long userId, Long fileTypeId) {
+        ApplicantFile researchFile=applicantFileRepository.findByUserId(userId,fileTypeId);
         try {
             Path file = rootLocation.resolve(researchFile.getFileName());
             Resource resource = new UrlResource(file.toUri());

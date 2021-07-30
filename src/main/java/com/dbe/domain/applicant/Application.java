@@ -20,6 +20,7 @@ public class Application {
     private Vacancy vacancy;
     @Column(name="applied_date")
     private Date appliedDate;
+    private Long Status;
     @OneToOne
     @JoinColumn(name="fileId",referencedColumnName = "id")
     private ApplicantFile applicantFile;
@@ -71,5 +72,13 @@ public class Application {
 
     public void setApplicationLetter(String applicationLetter) {
         this.applicationLetter = applicationLetter;
+    }
+
+    public Long getStatus() {
+        return Status;
+    }
+
+    public void setStatus(Long status) {
+        Status = status;
     }
 }

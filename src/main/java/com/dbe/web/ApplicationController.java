@@ -1,26 +1,24 @@
 package com.dbe.web;
 
+import com.dbe.domain.applicant.AppliedJobView;
 import com.dbe.domain.applicant.AppliedPersonelView;
 import com.dbe.services.application.ApplicationService;
 import com.dbe.services.application.model.ApplicantModel;
 import com.dbe.services.application.model.ApplicationModel;
 import com.dbe.services.application.model.SearchModel;
 import com.dbe.utilities.exception.StorageException;
-import com.dbe.utilities.file_services.FileModel;
 import com.dbe.utilities.file_services.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Date;
 import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -45,8 +43,8 @@ public class ApplicationController {
     }
 
     @RequestMapping("/store")
-    public void storeFile(@RequestParam MultipartFile file) {
-        applicationService.storeFile(file);
+    public void storeFile(@RequestParam MultipartFile file,@RequestParam Long fileTypeId) {
+        applicationService.storeFile(file,fileTypeId );
 
     }
     @PostMapping("/apply")
@@ -59,8 +57,8 @@ public class ApplicationController {
         return applicationService.appliedPersonelForVacancy(id);
     }
     @RequestMapping("/downloadFile")
-    public ResponseEntity<Resource> download(@RequestParam Long documentId, HttpServletRequest request) {
-        Resource resource = storageService.loadAsResource(documentId);
+    public ResponseEntity<Resource> download(@RequestParam Long documentId,@RequestParam Long fileTypeId, HttpServletRequest request) {
+        Resource resource = storageService.loadAsResource(documentId, fileTypeId);
 
         // Try to determine file's content type
         String contentType = null;
@@ -84,5 +82,10 @@ public class ApplicationController {
     @PostMapping("/search")
     public List<AppliedPersonelView> advanceSearch(@RequestBody SearchModel searchModel){
         return  applicationService.advanceSearch(searchModel);
+    }
+
+    @GetMapping("/applied-jobs")
+    public List<AppliedJobView> getAppliedJobs(){
+        return applicationService.getAppliedJobs();
     }
 }

@@ -3,7 +3,8 @@ package com.dbe.services.application.model;
 public class EducationalBackgroundModel {
     private Long id;
     private String fieldOfEducation;
-    private String qualification;
+    private String specialization;
+    private Long qualification;
     private String qualificationDesc;
     private String university;
     private String yearOfGraduation;
@@ -26,11 +27,19 @@ public class EducationalBackgroundModel {
         this.fieldOfEducation = fieldOfEducation;
     }
 
-    public String getQualification() {
+    public String getSpecialization() {
+        return specialization;
+    }
+
+    public void setSpecialization(String specialization) {
+        this.specialization = specialization;
+    }
+
+    public Long getQualification() {
         return qualification;
     }
 
-    public void setQualification(String qualification) {
+    public void setQualification(Long qualification) {
         this.qualification = qualification;
     }
 

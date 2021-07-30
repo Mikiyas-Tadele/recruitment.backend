@@ -5,7 +5,7 @@ import javax.persistence.*;
 /**
  * Created by Mikiyas on 15/03/2017.
  */
-@Table(name="lookup",schema = "recruitmentDB")
+@Table(name="setting_lookup",schema = "recruitmentDB")
 @Entity
 public class Lookup {
 

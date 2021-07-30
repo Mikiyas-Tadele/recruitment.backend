@@ -13,6 +13,7 @@ public class ApplicantFile {
     private Long id;
     private String fileName;
     private Long fileSize;
+    private Long fileType;
     @ManyToOne
     @JoinColumn(name="userId",referencedColumnName = "id")
     private UserEntity userEntity;
@@ -39,6 +40,14 @@ public class ApplicantFile {
 
     public void setFileSize(Long fileSize) {
         this.fileSize = fileSize;
+    }
+
+    public Long getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(Long fileType) {
+        this.fileType = fileType;
     }
 
     public UserEntity getUserEntity() {

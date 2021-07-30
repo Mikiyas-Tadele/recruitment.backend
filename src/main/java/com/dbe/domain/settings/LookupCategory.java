@@ -6,7 +6,7 @@ import java.util.Set;
 /**
  * Created by Mikiyas on 15/03/2017.
  */
-@Table(name = "lookup_category",schema = "recruitmentDB")
+@Table(name = "setting_lookup_category",schema = "recruitmentDB")
 @Entity
 public class LookupCategory {
 
