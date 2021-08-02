@@ -6,10 +6,16 @@ import com.dbe.repositories.vacancyRepository.VacancyDetailRepository;
 import com.dbe.repositories.vacancyRepository.VacancyRepository;
 import com.dbe.services.vacancy.model.VacancyModel;
 import com.dbe.services.vacancy.model.VacancyModelDetail;
+import com.dbe.utilities.models.SystemConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -33,7 +39,7 @@ public class VacancyServiceImpl implements VacancyService {
     public List<VacancyModel> getAllVacancies() {
 
         List<VacancyModel> models=new ArrayList<>();
-        Iterable<Vacancy> vacancies=vacancyRepository.findAll();
+        Iterable<Vacancy> vacancies=vacancyRepository.findActiveVacancies(SystemConstants.ACTIVE_VACANCY);
         for (Vacancy vacancy:vacancies) {
             models.add(getModelFromVacancyEntity(vacancy));
         }
@@ -64,6 +70,8 @@ public class VacancyServiceImpl implements VacancyService {
         vacancy.setQualification(vacancyModel.getQualification());
         vacancy.setTitle(vacancyModel.getTitle());
         vacancy.setWorkExperience(vacancyModel.getWorkExperience());
+        vacancy.setStatus(SystemConstants.ACTIVE_VACANCY);
+
 
         return vacancy;
     }
@@ -77,16 +85,29 @@ public class VacancyServiceImpl implements VacancyService {
         vacancyModel.setPostedDate(vacancy.getPostedDate());
         vacancyModel.setDeadlineDate(vacancy.getDeadlineDate());
         vacancyModel.setLocation(vacancy.getLocation());
-        List<VacancyModelDetail> vacancyModelDetails=new ArrayList<>();
-        for (VacancyDetail vacancyDetail:vacancy.getVacancyDetails()) {
-             VacancyModelDetail vacancyModelDetail=new VacancyModelDetail();
-             vacancyModelDetail.setVacancyId(vacancyDetail.getVacancy().getId());
-             vacancyModelDetail.setTitle(vacancyDetail.getTitle());
-             vacancyModelDetail.setDescription(vacancyDetail.getDescription());
-             vacancyModelDetails.add(vacancyModelDetail);
+        Duration duration=Duration.between(convertToLocalDateTimeViaInstant(vacancy.getPostedDate()),
+                LocalDateTime.now());
+        long minutes = duration.toMinutes();
+        if (minutes < 59) {
+            vacancyModel.setMinutesElapsedSinceCreation(minutes + " minutes ago");
+        } else if (minutes > 60) {
+            long hours = duration.toHours();
+            if (hours < 24) {
+                vacancyModel.setMinutesElapsedSinceCreation(hours + " hours ago");
+            } else {
+                long days = duration.toDays();
+                vacancyModel.setMinutesElapsedSinceCreation(days + " days ago");
+            }
         }
-
-        vacancyModel.getVacancyModelDetailList().addAll(vacancyModelDetails);
+        List<VacancyModelDetail> vacancyModelDetails=new ArrayList<>();
+            for (VacancyDetail vacancyDetail : vacancy.getVacancyDetails()) {
+                VacancyModelDetail vacancyModelDetail = new VacancyModelDetail();
+                vacancyModelDetail.setVacancyId(vacancyDetail.getVacancy().getId());
+                vacancyModelDetail.setTitle(vacancyDetail.getTitle());
+                vacancyModelDetail.setDescription(vacancyDetail.getDescription());
+                vacancyModelDetails.add(vacancyModelDetail);
+            }
+            vacancyModel.getVacancyModelDetailList().addAll(vacancyModelDetails);
 
         return vacancyModel;
     }
@@ -124,5 +145,29 @@ public class VacancyServiceImpl implements VacancyService {
     @Override
     public void deleteVacancyModelDetail(Long id) {
        vacancyDetailRepository.delete(id);
+    }
+
+    private LocalDateTime convertToLocalDateTimeViaInstant(Date dateToConvert) {
+        return dateToConvert.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+    }
+
+    @Override
+    public void makeDeadLinePassedVacanciesInActive() {
+      List<Vacancy> vacancies=vacancyRepository.findActiveVacancies(SystemConstants.ACTIVE_VACANCY);
+      boolean change=false;
+        for (Vacancy vacancy:vacancies) {
+            LocalDateTime deadLineDate=convertToLocalDateTimeViaInstant(vacancy.getDeadlineDate());
+            LocalDateTime today=LocalDateTime.now();
+            if(today.isAfter(deadLineDate)){
+                change=true;
+                vacancy.setStatus(SystemConstants.INACTIVE_VACANCY);
+            }
+        }
+
+        if(change){
+            vacancyRepository.save(vacancies);
+        }
     }
 }

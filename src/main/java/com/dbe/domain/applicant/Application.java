@@ -21,9 +21,6 @@ public class Application {
     @Column(name="applied_date")
     private Date appliedDate;
     private Long Status;
-    @OneToOne
-    @JoinColumn(name="fileId",referencedColumnName = "id")
-    private ApplicantFile applicantFile;
     private String applicationLetter;
 
     public Long getId() {
@@ -56,14 +53,6 @@ public class Application {
 
     public void setAppliedDate(Date appliedDate) {
         this.appliedDate = appliedDate;
-    }
-
-    public ApplicantFile getApplicantFile() {
-        return applicantFile;
-    }
-
-    public void setApplicantFile(ApplicantFile applicantFile) {
-        this.applicantFile = applicantFile;
     }
 
     public String getApplicationLetter() {

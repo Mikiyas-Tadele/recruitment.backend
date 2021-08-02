@@ -10,5 +10,6 @@ public class AppliedPersonelView_ {
     public static volatile SingularAttribute<AppliedPersonelView,Long> workExperienceInYears;
     public static volatile SingularAttribute<AppliedPersonelView,Long> vacancyId;
     public static volatile SingularAttribute<AppliedPersonelView,Double> cgpa;
+    public static volatile SingularAttribute<AppliedPersonelView,Long> qualification;
 
 }

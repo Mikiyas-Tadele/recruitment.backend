@@ -9,6 +9,7 @@ public class SearchModel {
     private String cgpaCriteria;
     private String workExperienceCriteria;
     private Long vacancyId;
+    private Long qualification;
 
     public Long getAge() {
         return age;
@@ -72,5 +73,13 @@ public class SearchModel {
 
     public void setVacancyId(Long vacancyId) {
         this.vacancyId = vacancyId;
+    }
+
+    public Long getQualification() {
+        return qualification;
+    }
+
+    public void setQualification(Long qualification) {
+        this.qualification = qualification;
     }
 }

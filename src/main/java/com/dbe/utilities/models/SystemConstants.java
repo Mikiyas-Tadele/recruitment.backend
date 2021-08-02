@@ -7,5 +7,9 @@ public interface SystemConstants {
        Long CV_FILE=1l;
        Long QUALIFICATION_FILE=2l;
 
+       Long ACTIVE_VACANCY=1l;
+       Long INACTIVE_VACANCY=2l;
+
+
 
 }

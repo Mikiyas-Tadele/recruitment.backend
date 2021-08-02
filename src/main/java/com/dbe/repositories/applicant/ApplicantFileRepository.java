@@ -7,5 +7,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface ApplicantFileRepository extends CrudRepository<ApplicantFile,Long> {
     @Query("select af from ApplicantFile af join af.userEntity u where u.id=:userId and af.fileType=:fileTypeId")
-    ApplicantFile findByUserId(@Param("userId")Long userId,@Param("fileType")Long fileTypeId);
+    ApplicantFile findByUserId(@Param("userId")Long userId,@Param("fileTypeId")Long fileTypeId);
+
+    @Query("select af from ApplicantFile  af join af.application a where a.id=:applicationId")
+    ApplicantFile findByApplicationId(@Param("applicationId")Long applicationId);
 }

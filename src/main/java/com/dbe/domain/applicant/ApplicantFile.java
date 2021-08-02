@@ -17,6 +17,9 @@ public class ApplicantFile {
     @ManyToOne
     @JoinColumn(name="userId",referencedColumnName = "id")
     private UserEntity userEntity;
+    @ManyToOne
+    @JoinColumn(name="applicationId",referencedColumnName = "id")
+    private Application application;
 
     public Long getId() {
         return id;
@@ -56,5 +59,13 @@ public class ApplicantFile {
 
     public void setUserEntity(UserEntity userEntity) {
         this.userEntity = userEntity;
+    }
+
+    public Application getApplication() {
+        return application;
+    }
+
+    public void setApplication(Application application) {
+        this.application = application;
     }
 }

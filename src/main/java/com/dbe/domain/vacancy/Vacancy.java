@@ -4,6 +4,7 @@ import com.dbe.domain.applicant.Application;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -23,10 +24,11 @@ public class Vacancy {
     private Date postedDate;
     @Column(name="deadline_date")
     private  Date DeadlineDate;
+    private Long status;
     @OneToMany(mappedBy = "vacancy")
     private Set<Application> applications;
     @OneToMany(mappedBy = "vacancy",cascade = CascadeType.ALL)
-    private Set<VacancyDetail> vacancyDetails;
+    private Set<VacancyDetail> vacancyDetails = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -82,6 +84,14 @@ public class Vacancy {
 
     public void setDeadlineDate(Date deadlineDate) {
         DeadlineDate = deadlineDate;
+    }
+
+    public Long getStatus() {
+        return status;
+    }
+
+    public void setStatus(Long status) {
+        this.status = status;
     }
 
     public Set<Application> getApplications() {

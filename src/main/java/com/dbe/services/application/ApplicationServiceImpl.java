@@ -13,6 +13,7 @@ import com.dbe.utilities.current_users.IAuthenticationFacade;
 import com.dbe.utilities.exception.ApplicationException;
 import com.dbe.utilities.file_services.FileModel;
 import com.dbe.utilities.file_services.FileStorageService;
+import com.dbe.utilities.models.SystemConstants;
 import com.dbe.utilities.specifications.AppliedPersonelSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -141,7 +142,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
     }
 
     @Override
-    public void storeFile(MultipartFile file, Long fileTypeId) {
+    public void storeFile(MultipartFile file, Long applicationId) {
         IAuthenticationFacade authenticationFacade= new AuthenticationFacade();
         UserPrinciple authentication= (UserPrinciple) authenticationFacade.getAuthentication().getPrincipal();
         Optional<UserEntity> userEntity= userRepository.findByUsernameAndEnabled(authentication.getUsername(),true);
@@ -149,15 +150,19 @@ public class ApplicationServiceImpl implements  ApplicationService {
         FileModel fileModel = new FileModel();
         fileModel.setFileName(StringUtils.cleanPath(file.getOriginalFilename()));
         fileModel.setFileSize(file.getSize());
-        ApplicantFile existingApplicantFile=applicantFileRepository.findByUserId(userEntity.get().getId(),fileTypeId);
-        if(existingApplicantFile!=null){
-            storageService.delete(userEntity.get().getId(),fileTypeId );
+        if(applicationId==0){
+            ApplicantFile existingApplicantFile=applicantFileRepository.findByUserId(userEntity.get().getId(), SystemConstants.CV_FILE);
+            if(existingApplicantFile!=null){
+                storageService.delete(userEntity.get().getId(), SystemConstants.CV_FILE);
+            }
         }
         storageService.store(file, fileModel);
         ApplicantFile applicantFile=new ApplicantFile();
         applicantFile.setFileName(fileModel.getFileName());
         applicantFile.setFileSize(fileModel.getFileSize());
         applicantFile.setUserEntity(userEntity.get());
+        applicantFile.setApplication(applicationRepository.findOne(applicationId));
+        applicantFile.setFileType(applicationId==0?SystemConstants.CV_FILE:SystemConstants.QUALIFICATION_FILE);
 
        applicantFileRepository.save(applicantFile);
     }
@@ -201,7 +206,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
     }
 
     @Override
-    public void applyForPosition(ApplicationModel model) {
+    public ApplicationModel applyForPosition(ApplicationModel model) {
         IAuthenticationFacade authenticationFacade= new AuthenticationFacade();
         UserPrinciple authentication= (UserPrinciple) authenticationFacade.getAuthentication().getPrincipal();
         Optional<UserEntity> userEntity= userRepository.findByUsernameAndEnabled(authentication.getUsername(),true);
@@ -225,7 +230,9 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
          applicationRepository.save(application);
 
+         model.setId(application.getId());
 
+      return model;
     }
 
     @Override
@@ -240,8 +247,8 @@ public class ApplicationServiceImpl implements  ApplicationService {
         return appliedPersonelViewRepository.findAll(where(AppliedPersonelSpecification.vacancyPredicate(searchModel.getVacancyId()))
                 .and(AppliedPersonelSpecification.genderPredicate(searchModel.getGender()))
                 .and(AppliedPersonelSpecification.agePredicate(searchModel.getAge(),searchModel.getAgeCriteria()))
-                .and(AppliedPersonelSpecification.workExperiencePredicate(searchModel.getWorkExperience(),searchModel.getWorkExperienceCriteria()))
-                .and(AppliedPersonelSpecification.cgpaPredicate(searchModel.getCgpa(),searchModel.getCgpaCriteria())));
+                .and(AppliedPersonelSpecification.cgpaPredicate(searchModel.getCgpa(),searchModel.getCgpaCriteria()))
+                .and(AppliedPersonelSpecification.qualificationPredicate(searchModel.getQualification())));
     }
 
     @Override

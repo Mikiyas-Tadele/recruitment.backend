@@ -7,11 +7,13 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @SpringBootApplication
+@EnableScheduling
 @ComponentScan(basePackages = "com.dbe")
 public class BackendApplication extends SpringBootServletInitializer {
 

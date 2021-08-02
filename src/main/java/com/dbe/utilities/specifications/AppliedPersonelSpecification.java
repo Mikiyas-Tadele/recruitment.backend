@@ -24,7 +24,7 @@ public class AppliedPersonelSpecification {
                     return criteriaBuilder.lessThanOrEqualTo(root.get(AppliedPersonelView_.age),age);
                 }
             }else{
-                return criteriaBuilder.greaterThan(root.get(AppliedPersonelView_.age),0L);
+                return criteriaBuilder.greaterThanOrEqualTo(root.get(AppliedPersonelView_.age),0L);
             }
         };
     }
@@ -61,6 +61,14 @@ public class AppliedPersonelSpecification {
 
     public static Specification<AppliedPersonelView> vacancyPredicate(final Long vacancyId){
         return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(AppliedPersonelView_.vacancyId),vacancyId);
+    }
+    public static Specification<AppliedPersonelView> qualificationPredicate(final Long qualification){
+        if(qualification!=null){
+            return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(AppliedPersonelView_.qualification),qualification);
+        }else{
+            return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.greaterThan(root.get(AppliedPersonelView_.qualification),0L);
+        }
+
     }
 
 

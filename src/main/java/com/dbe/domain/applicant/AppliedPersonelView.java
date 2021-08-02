@@ -35,6 +35,8 @@ public class AppliedPersonelView {
     private Long vacancyId;
     private Long userId;
     private Long workExperienceInYears;
+    private String applicationLetter;
+    private Long applicationId;
 
     public Long getId() {
         return id;
@@ -226,5 +228,21 @@ public class AppliedPersonelView {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public String getApplicationLetter() {
+        return applicationLetter;
+    }
+
+    public void setApplicationLetter(String applicationLetter) {
+        this.applicationLetter = applicationLetter;
+    }
+
+    public Long getApplicationId() {
+        return applicationId;
+    }
+
+    public void setApplicationId(Long applicationId) {
+        this.applicationId = applicationId;
     }
 }

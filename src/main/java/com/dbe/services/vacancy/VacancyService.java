@@ -11,6 +11,7 @@ public interface VacancyService {
     List<VacancyModel> getAllVacancies();
     VacancyModel getVacancy(Long id);
     void deleteVacancy(VacancyModel vacancyModel);
+    void makeDeadLinePassedVacanciesInActive();
 
     void addOrUpdateVacancyDetail(VacancyModelDetail vacancyModelDetail);
     List<VacancyModelDetail> getAllDetailsForVacancy(Long vacancyId);

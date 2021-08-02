@@ -4,6 +4,7 @@ import com.dbe.domain.applicant.ApplicantFile;
 import com.dbe.repositories.applicant.ApplicantFileRepository;
 import com.dbe.utilities.exception.StorageException;
 import com.dbe.utilities.exception.StorageFileNotFoundException;
+import com.dbe.utilities.models.SystemConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -81,9 +82,9 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
 
     @Override
-    public Resource loadAsResource(Long userId, Long fileTypeId) {
-
-        ApplicantFile researchFile=applicantFileRepository.findByUserId(userId,fileTypeId);
+    public Resource loadAsResource(Long userId, Long applicationId) {
+        ApplicantFile researchFile=applicationId!=0?applicantFileRepository.findByApplicationId(applicationId):
+                applicantFileRepository.findByUserId(userId, SystemConstants.CV_FILE);
         try {
             Path file = rootLocation.resolve(researchFile.getFileName());
             Resource resource = new UrlResource(file.toUri());

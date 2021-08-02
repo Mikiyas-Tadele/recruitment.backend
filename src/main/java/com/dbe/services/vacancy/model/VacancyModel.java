@@ -12,7 +12,9 @@ public class VacancyModel {
     private  String location;
     private  Date postedDate;
     private  Date deadlineDate;
+    private  String minutesElapsedSinceCreation;
     private List<VacancyModelDetail> vacancyModelDetailList=new ArrayList<>();
+
 
     public Long getId() {
         return id;
@@ -68,6 +70,14 @@ public class VacancyModel {
 
     public void setDeadlineDate(Date deadlineDate) {
         this.deadlineDate = deadlineDate;
+    }
+
+    public String getMinutesElapsedSinceCreation() {
+        return minutesElapsedSinceCreation;
+    }
+
+    public void setMinutesElapsedSinceCreation(String minutesElapsedSinceCreation) {
+        this.minutesElapsedSinceCreation = minutesElapsedSinceCreation;
     }
 
     public List<VacancyModelDetail> getVacancyModelDetailList() {

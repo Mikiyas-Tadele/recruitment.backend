@@ -43,13 +43,13 @@ public class ApplicationController {
     }
 
     @RequestMapping("/store")
-    public void storeFile(@RequestParam MultipartFile file,@RequestParam Long fileTypeId) {
-        applicationService.storeFile(file,fileTypeId );
+    public void storeFile(@RequestParam MultipartFile file,@RequestParam Long applicationId) {
+        applicationService.storeFile(file, applicationId);
 
     }
     @PostMapping("/apply")
-    public void applyForPosition(@RequestBody ApplicationModel applicationModel){
-        applicationService.applyForPosition(applicationModel);
+    public ApplicationModel applyForPosition(@RequestBody ApplicationModel applicationModel){
+       return applicationService.applyForPosition(applicationModel);
     }
 
     @GetMapping("/appliedPersonel/{id}")
@@ -57,8 +57,8 @@ public class ApplicationController {
         return applicationService.appliedPersonelForVacancy(id);
     }
     @RequestMapping("/downloadFile")
-    public ResponseEntity<Resource> download(@RequestParam Long documentId,@RequestParam Long fileTypeId, HttpServletRequest request) {
-        Resource resource = storageService.loadAsResource(documentId, fileTypeId);
+    public ResponseEntity<Resource> download(@RequestParam Long documentId, @RequestParam Long applicationId, HttpServletRequest request) {
+        Resource resource = storageService.loadAsResource(documentId, applicationId);
 
         // Try to determine file's content type
         String contentType = null;

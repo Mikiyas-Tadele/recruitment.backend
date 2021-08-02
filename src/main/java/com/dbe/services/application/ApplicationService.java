@@ -16,9 +16,9 @@ public interface ApplicationService {
 
     ApplicantModel getApplicantModel();
 
-    void storeFile(MultipartFile file, Long fileTypeId);
+    void storeFile(MultipartFile file, Long applicationId);
 
-    void applyForPosition(ApplicationModel model);
+    ApplicationModel applyForPosition(ApplicationModel model);
 
     List<AppliedPersonelView> appliedPersonelForVacancy(Long vacancyId) throws ParseException;
 
