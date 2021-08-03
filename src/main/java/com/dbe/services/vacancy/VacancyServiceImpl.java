@@ -14,9 +14,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class VacancyServiceImpl implements VacancyService {
@@ -39,10 +37,25 @@ public class VacancyServiceImpl implements VacancyService {
     public List<VacancyModel> getAllVacancies() {
 
         List<VacancyModel> models=new ArrayList<>();
+        Iterable<Vacancy> vacancies=vacancyRepository.findAll();
+        for (Vacancy vacancy:vacancies) {
+            models.add(getModelFromVacancyEntity(vacancy));
+        }
+
+        Collections.sort(models, Comparator.comparing(VacancyModel::getPostedDate).reversed());
+
+        return models;
+    }
+
+    @Override
+    public List<VacancyModel> getAllActiveVacancies() {
+        List<VacancyModel> models=new ArrayList<>();
         Iterable<Vacancy> vacancies=vacancyRepository.findActiveVacancies(SystemConstants.ACTIVE_VACANCY);
         for (Vacancy vacancy:vacancies) {
             models.add(getModelFromVacancyEntity(vacancy));
         }
+
+         Collections.sort(models, Comparator.comparing(VacancyModel::getPostedDate).reversed());
 
         return models;
     }
@@ -85,6 +98,7 @@ public class VacancyServiceImpl implements VacancyService {
         vacancyModel.setPostedDate(vacancy.getPostedDate());
         vacancyModel.setDeadlineDate(vacancy.getDeadlineDate());
         vacancyModel.setLocation(vacancy.getLocation());
+        vacancyModel.setClosed(vacancy.getStatus()==2l ? true :false);
         Duration duration=Duration.between(convertToLocalDateTimeViaInstant(vacancy.getPostedDate()),
                 LocalDateTime.now());
         long minutes = duration.toMinutes();

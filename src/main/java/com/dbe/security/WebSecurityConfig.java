@@ -33,7 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/api/auth/login",
              "/api/auth/register-user",
             "/api/auth/verify/{id}",
-            "/api/vacancy/vacancies",
+            "/api/vacancy/active-vacancies",
             "/api/vacancy/vacancy/{id}"
     };
 

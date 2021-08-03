@@ -14,6 +14,7 @@ public class VacancyModel {
     private  Date deadlineDate;
     private  String minutesElapsedSinceCreation;
     private List<VacancyModelDetail> vacancyModelDetailList=new ArrayList<>();
+    private boolean closed;
 
 
     public Long getId() {
@@ -86,5 +87,13 @@ public class VacancyModel {
 
     public void setVacancyModelDetailList(List<VacancyModelDetail> vacancyModelDetailList) {
         this.vacancyModelDetailList = vacancyModelDetailList;
+    }
+
+    public boolean isClosed() {
+        return closed;
+    }
+
+    public void setClosed(boolean closed) {
+        this.closed = closed;
     }
 }

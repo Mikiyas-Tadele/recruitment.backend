@@ -46,4 +46,9 @@ public class VacancyController {
     public List<VacancyModelDetail> getVacancyDetails(@PathVariable Long vacancyId){
         return vacancyService.getAllDetailsForVacancy(vacancyId);
     }
+
+    @GetMapping("/active-vacancies")
+    public List<VacancyModel> getAllActiveVacancies(){
+        return vacancyService.getAllActiveVacancies();
+    }
 }
