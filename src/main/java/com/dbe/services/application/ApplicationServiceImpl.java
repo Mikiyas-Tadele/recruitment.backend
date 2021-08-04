@@ -238,7 +238,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
     @Override
     public List<AppliedPersonelView> appliedPersonelForVacancy(Long vacancyId) throws ParseException {
         List<AppliedPersonelView> personelViewList=appliedPersonelViewRepository.findByVacancyId(vacancyId);
-
+        Collections.sort(personelViewList,Comparator.comparing(AppliedPersonelView::getApplicantId));
         return personelViewList;
     }
 

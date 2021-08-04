@@ -34,9 +34,11 @@ public class AppliedPersonelView {
     private Date endDate;
     private Long vacancyId;
     private Long userId;
-    private Long workExperienceInYears;
+    private Double workExperienceInYears;
     private String applicationLetter;
     private Long applicationId;
+    @Column(name="total_workexperience")
+    private Double totalExperience;
 
     public Long getId() {
         return id;
@@ -206,12 +208,20 @@ public class AppliedPersonelView {
         this.age = age;
     }
 
-    public Long getWorkExperienceInYears() {
+    public Double getWorkExperienceInYears() {
         return workExperienceInYears;
     }
 
-    public void setWorkExperienceInYears(Long workExperienceInYears) {
+    public void setWorkExperienceInYears(Double workExperienceInYears) {
         this.workExperienceInYears = workExperienceInYears;
+    }
+
+    public Double getTotalExperience() {
+        return totalExperience;
+    }
+
+    public void setTotalExperience(Double totalExperience) {
+        this.totalExperience = totalExperience;
     }
 
     public String getEmail() {
