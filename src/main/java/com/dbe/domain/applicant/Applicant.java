@@ -36,6 +36,10 @@ public class Applicant {
     private Set<WorkExperience> workExperiences = new HashSet<>();
     @OneToMany(mappedBy = "applicant",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private Set<Application> applications;
+    @OneToMany(mappedBy = "applicant",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    private Set<Certification> certifications=new HashSet<>();
+    @Column(name="DISABILITY_DESCRIPTION")
+    private String  disabilityDescription;
 
     public Long getId() {
         return id;
@@ -147,5 +151,21 @@ public class Applicant {
 
     public void setApplications(Set<Application> applications) {
         this.applications = applications;
+    }
+
+    public String getDisabilityDescription() {
+        return disabilityDescription;
+    }
+
+    public void setDisabilityDescription(String disabilityDescription) {
+        this.disabilityDescription = disabilityDescription;
+    }
+
+    public Set<Certification> getCertifications() {
+        return certifications;
+    }
+
+    public void setCertifications(Set<Certification> certifications) {
+        this.certifications = certifications;
     }
 }

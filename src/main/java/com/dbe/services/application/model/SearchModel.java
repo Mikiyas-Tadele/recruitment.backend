@@ -10,6 +10,8 @@ public class SearchModel {
     private String workExperienceCriteria;
     private Long vacancyId;
     private Long qualification;
+    private Long graduationYear;
+    private String graduationYearCriteria;
 
     public Long getAge() {
         return age;
@@ -81,5 +83,21 @@ public class SearchModel {
 
     public void setQualification(Long qualification) {
         this.qualification = qualification;
+    }
+
+    public Long getGraduationYear() {
+        return graduationYear;
+    }
+
+    public void setGraduationYear(Long graduationYear) {
+        this.graduationYear = graduationYear;
+    }
+
+    public String getGraduationYearCriteria() {
+        return graduationYearCriteria;
+    }
+
+    public void setGraduationYearCriteria(String graduationYearCriteria) {
+        this.graduationYearCriteria = graduationYearCriteria;
     }
 }

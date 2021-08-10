@@ -55,6 +55,7 @@ public class VacancyServiceImpl implements VacancyService {
             models.add(getModelFromVacancyEntity(vacancy));
         }
 
+
          Collections.sort(models, Comparator.comparing(VacancyModel::getPostedDate).reversed());
 
         return models;
@@ -84,6 +85,10 @@ public class VacancyServiceImpl implements VacancyService {
         vacancy.setTitle(vacancyModel.getTitle());
         vacancy.setWorkExperience(vacancyModel.getWorkExperience());
         vacancy.setStatus(SystemConstants.ACTIVE_VACANCY);
+        vacancy.setEmploymentCondition(vacancyModel.getEmploymentCondition());
+        vacancy.setRequiredNumber(vacancyModel.getRequiredNumber());
+        vacancy.setSalary(vacancyModel.getSalary());
+        vacancy.setSalaryDescription(vacancyModel.getSalaryDescription());
 
 
         return vacancy;
@@ -99,20 +104,25 @@ public class VacancyServiceImpl implements VacancyService {
         vacancyModel.setDeadlineDate(vacancy.getDeadlineDate());
         vacancyModel.setLocation(vacancy.getLocation());
         vacancyModel.setClosed(vacancy.getStatus()==2l ? true :false);
-        Duration duration=Duration.between(convertToLocalDateTimeViaInstant(vacancy.getPostedDate()),
-                LocalDateTime.now());
-        long minutes = duration.toMinutes();
-        if (minutes < 59) {
-            vacancyModel.setMinutesElapsedSinceCreation(minutes + " minutes ago");
-        } else if (minutes > 60) {
-            long hours = duration.toHours();
-            if (hours < 24) {
-                vacancyModel.setMinutesElapsedSinceCreation(hours + " hours ago");
-            } else {
-                long days = duration.toDays();
-                vacancyModel.setMinutesElapsedSinceCreation(days + " days ago");
-            }
+        vacancyModel.setEmploymentCondition(vacancy.getEmploymentCondition());
+        vacancyModel.setRequiredNumber(vacancy.getRequiredNumber());
+        vacancyModel.setSalary(vacancy.getSalary());
+        vacancyModel.setSalaryDescription(vacancy.getSalaryDescription());
+        Duration duration=Duration.between(LocalDateTime.now(),convertToLocalDateTimeViaInstant(vacancy.getDeadlineDate()).plusDays(1));
+        long days = duration.toDays();
+        String daysLeft="";
+        if(days==1){
+            daysLeft= days + " Day left before closing";
         }
+        else if(days>0){
+            daysLeft= days + " Days left before closing";
+        }
+        else if(days==0){
+            daysLeft=" Today is closing Date";
+        }else {
+            daysLeft =Math.abs(days) + " days has passed since closing";
+        }
+        vacancyModel.setMinutesElapsedSinceCreation(daysLeft);
         List<VacancyModelDetail> vacancyModelDetails=new ArrayList<>();
             for (VacancyDetail vacancyDetail : vacancy.getVacancyDetails()) {
                 VacancyModelDetail vacancyModelDetail = new VacancyModelDetail();
@@ -174,7 +184,7 @@ public class VacancyServiceImpl implements VacancyService {
         for (Vacancy vacancy:vacancies) {
             LocalDateTime deadLineDate=convertToLocalDateTimeViaInstant(vacancy.getDeadlineDate());
             LocalDateTime today=LocalDateTime.now();
-            if(today.isAfter(deadLineDate)){
+            if(today.isAfter(deadLineDate.plusDays(1))){
                 change=true;
                 vacancy.setStatus(SystemConstants.INACTIVE_VACANCY);
             }

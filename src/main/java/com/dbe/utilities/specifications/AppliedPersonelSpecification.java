@@ -7,7 +7,7 @@ import org.springframework.data.jpa.domain.Specification;
 public class AppliedPersonelSpecification {
     public static Specification<AppliedPersonelView> genderPredicate(final String gender){
         return (root, criteriaQuery, criteriaBuilder) ->{
-            if(!gender.isEmpty() && gender!=null){
+            if( gender!=null && !gender.isEmpty()){
                 return criteriaBuilder.like(root.get(AppliedPersonelView_.gender),gender);
             }else{
                 return criteriaBuilder.like(root.get(AppliedPersonelView_.gender),"%");
@@ -20,8 +20,10 @@ public class AppliedPersonelSpecification {
                 if(operation.equals("greaterthan"))
                 {
                     return criteriaBuilder.greaterThanOrEqualTo(root.get(AppliedPersonelView_.age),age);
-                }else{
+                }else if(operation.equals("lessthan")){
                     return criteriaBuilder.lessThanOrEqualTo(root.get(AppliedPersonelView_.age),age);
+                }else{
+                    return criteriaBuilder.equal(root.get(AppliedPersonelView_.age),age);
                 }
             }else{
                 return criteriaBuilder.greaterThanOrEqualTo(root.get(AppliedPersonelView_.age),0L);
@@ -33,12 +35,14 @@ public class AppliedPersonelSpecification {
             if(workExperienceInYears!=null){
                 if(operation.equals("greaterthan"))
                 {
-                    return criteriaBuilder.greaterThanOrEqualTo(root.get(AppliedPersonelView_.workExperienceInYears),workExperienceInYears);
+                    return criteriaBuilder.greaterThanOrEqualTo(root.get(AppliedPersonelView_.totalExperience),workExperienceInYears);
+                }else if(operation.equals("lessthan")){
+                    return criteriaBuilder.lessThanOrEqualTo(root.get(AppliedPersonelView_.totalExperience),workExperienceInYears);
                 }else{
-                    return criteriaBuilder.lessThanOrEqualTo(root.get(AppliedPersonelView_.workExperienceInYears),workExperienceInYears);
+                    return criteriaBuilder.equal(root.get(AppliedPersonelView_.totalExperience),workExperienceInYears);
                 }
             }else{
-                return criteriaBuilder.greaterThan(root.get(AppliedPersonelView_.workExperienceInYears),0L);
+                return criteriaBuilder.greaterThanOrEqualTo(root.get(AppliedPersonelView_.totalExperience),0l);
             }
         };
     }
@@ -49,11 +53,31 @@ public class AppliedPersonelSpecification {
                 if(operation.equals("greaterthan"))
                 {
                     return criteriaBuilder.greaterThanOrEqualTo(root.get(AppliedPersonelView_.cgpa),cgpa);
-                }else{
+                }else if(operation.equals("lessthan")){
                     return criteriaBuilder.lessThanOrEqualTo(root.get(AppliedPersonelView_.cgpa),cgpa);
+                }else{
+                    return criteriaBuilder.equal(root.get(AppliedPersonelView_.cgpa),cgpa);
                 }
             }else{
-                return criteriaBuilder.greaterThan(root.get(AppliedPersonelView_.cgpa),0D);
+                return criteriaBuilder.greaterThanOrEqualTo(root.get(AppliedPersonelView_.cgpa),0D);
+            }
+        };
+    }
+
+
+    public static Specification<AppliedPersonelView> graduationYearPredicate(final Long year,final String operation){
+        return (root, criteriaQuery, criteriaBuilder) ->{
+            if(year!=null){
+                if(operation.equals("greaterthan"))
+                {
+                    return criteriaBuilder.greaterThanOrEqualTo(root.get(AppliedPersonelView_.yearOfGraduation),year);
+                }else if(operation.equals("lessthan")){
+                    return criteriaBuilder.lessThanOrEqualTo(root.get(AppliedPersonelView_.yearOfGraduation),year);
+                }else{
+                    return criteriaBuilder.equal(root.get(AppliedPersonelView_.yearOfGraduation),year);
+                }
+            }else{
+                return criteriaBuilder.greaterThanOrEqualTo(root.get(AppliedPersonelView_.yearOfGraduation),0L);
             }
         };
     }
@@ -66,10 +90,12 @@ public class AppliedPersonelSpecification {
         if(qualification!=null){
             return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.equal(root.get(AppliedPersonelView_.qualification),qualification);
         }else{
-            return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.greaterThan(root.get(AppliedPersonelView_.qualification),0L);
+            return (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.greaterThanOrEqualTo(root.get(AppliedPersonelView_.qualification),0L);
         }
 
     }
+
+
 
 
 }

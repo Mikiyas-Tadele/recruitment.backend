@@ -18,8 +18,10 @@ public class ApplicantModel {
     private String mPhone1;
     private String mPhone2;
     private String fPhone;
+    private String disabilityDescription;
     private List<EducationalBackgroundModel> educationalBackgrounds=new ArrayList<>();
     private List<WorkExperienceModel> workExperiences=new ArrayList<>();
+    private List<CertificationModel> certifications=new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -131,5 +133,21 @@ public class ApplicantModel {
 
     public void setWorkExperiences(List<WorkExperienceModel> workExperiences) {
         this.workExperiences = workExperiences;
+    }
+
+    public String getDisabilityDescription() {
+        return disabilityDescription;
+    }
+
+    public void setDisabilityDescription(String disabilityDescription) {
+        this.disabilityDescription = disabilityDescription;
+    }
+
+    public List<CertificationModel> getCertifications() {
+        return certifications;
+    }
+
+    public void setCertifications(List<CertificationModel> certifications) {
+        this.certifications = certifications;
     }
 }

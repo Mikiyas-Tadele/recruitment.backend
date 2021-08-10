@@ -25,6 +25,13 @@ public class Vacancy {
     @Column(name="deadline_date")
     private  Date DeadlineDate;
     private Long status;
+    @Column(name="EMPLOYMENT_CONDITION")
+    private String employmentCondition;
+    @Column(name="REQUIRED_NUMBER")
+    private Long requiredNumber;
+    private Double salary;
+    @Column(name="SALARY_DSCRIPTION")
+    private String salaryDescription;
     @OneToMany(mappedBy = "vacancy")
     private Set<Application> applications;
     @OneToMany(mappedBy = "vacancy",cascade = CascadeType.ALL)
@@ -108,5 +115,37 @@ public class Vacancy {
 
     public void setVacancyDetails(Set<VacancyDetail> vacancyDetails) {
         this.vacancyDetails = vacancyDetails;
+    }
+
+    public String getEmploymentCondition() {
+        return employmentCondition;
+    }
+
+    public void setEmploymentCondition(String employmentCondition) {
+        this.employmentCondition = employmentCondition;
+    }
+
+    public Long getRequiredNumber() {
+        return requiredNumber;
+    }
+
+    public void setRequiredNumber(Long requiredNumber) {
+        this.requiredNumber = requiredNumber;
+    }
+
+    public Double getSalary() {
+        return salary;
+    }
+
+    public void setSalary(Double salary) {
+        this.salary = salary;
+    }
+
+    public String getSalaryDescription() {
+        return salaryDescription;
+    }
+
+    public void setSalaryDescription(String salaryDescription) {
+        this.salaryDescription = salaryDescription;
     }
 }

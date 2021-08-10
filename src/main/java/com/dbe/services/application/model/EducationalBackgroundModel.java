@@ -7,7 +7,7 @@ public class EducationalBackgroundModel {
     private Long qualification;
     private String qualificationDesc;
     private String university;
-    private String yearOfGraduation;
+    private Long yearOfGraduation;
     private Long applicantId;
     private Double cgpa;
 
@@ -59,11 +59,11 @@ public class EducationalBackgroundModel {
         this.university = university;
     }
 
-    public String getYearOfGraduation() {
+    public Long getYearOfGraduation() {
         return yearOfGraduation;
     }
 
-    public void setYearOfGraduation(String yearOfGraduation) {
+    public void setYearOfGraduation(Long yearOfGraduation) {
         this.yearOfGraduation = yearOfGraduation;
     }
 

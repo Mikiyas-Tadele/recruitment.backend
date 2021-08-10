@@ -1,6 +1,7 @@
 package com.dbe.repositories.applicant;
 
 import com.dbe.domain.applicant.Applicant;
+import com.dbe.domain.applicant.Certification;
 import com.dbe.domain.applicant.EducationalBackground;
 import com.dbe.domain.applicant.WorkExperience;
 import org.springframework.data.jpa.repository.Query;
@@ -18,5 +19,8 @@ public interface ApplicantRepository extends CrudRepository<Applicant,Long> {
 
     @Query("select edu from Applicant a join a.educationalBackgrounds edu where edu.id=:eduId")
     EducationalBackground findApplicantEduBkg(@Param("eduId") Long eduId);
+
+    @Query("select cert from Applicant  a join a.certifications cert where cert.id=:certId")
+    Certification findApllicantByCertifications(@Param("certId")Long certId);
 
 }

@@ -15,7 +15,7 @@ public class EducationalBackground {
     private Long qualification;
     private String university;
     @Column(name="YEAR_OF_GRADUATION")
-    private String yearOfGraduation;
+    private Long yearOfGraduation;
     private Double cgpa;
     @ManyToOne
     @JoinColumn(name="applicantId",referencedColumnName = "id")
@@ -61,11 +61,11 @@ public class EducationalBackground {
         this.university = university;
     }
 
-    public String getYearOfGraduation() {
+    public Long getYearOfGraduation() {
         return yearOfGraduation;
     }
 
-    public void setYearOfGraduation(String yearOfGraduation) {
+    public void setYearOfGraduation(Long yearOfGraduation) {
         this.yearOfGraduation = yearOfGraduation;
     }
 

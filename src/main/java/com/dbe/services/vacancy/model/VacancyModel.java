@@ -13,6 +13,10 @@ public class VacancyModel {
     private  Date postedDate;
     private  Date deadlineDate;
     private  String minutesElapsedSinceCreation;
+    private String employmentCondition;
+    private Long requiredNumber;
+    private Double salary;
+    private String salaryDescription;
     private List<VacancyModelDetail> vacancyModelDetailList=new ArrayList<>();
     private boolean closed;
 
@@ -95,5 +99,37 @@ public class VacancyModel {
 
     public void setClosed(boolean closed) {
         this.closed = closed;
+    }
+
+    public String getEmploymentCondition() {
+        return employmentCondition;
+    }
+
+    public void setEmploymentCondition(String employmentCondition) {
+        this.employmentCondition = employmentCondition;
+    }
+
+    public Long getRequiredNumber() {
+        return requiredNumber;
+    }
+
+    public void setRequiredNumber(Long requiredNumber) {
+        this.requiredNumber = requiredNumber;
+    }
+
+    public Double getSalary() {
+        return salary;
+    }
+
+    public void setSalary(Double salary) {
+        this.salary = salary;
+    }
+
+    public String getSalaryDescription() {
+        return salaryDescription;
+    }
+
+    public void setSalaryDescription(String salaryDescription) {
+        this.salaryDescription = salaryDescription;
     }
 }

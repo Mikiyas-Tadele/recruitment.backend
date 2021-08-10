@@ -24,7 +24,7 @@ public class AppliedPersonelView {
     private String qualification;
     private String university;
     @Column(name="YEAR_OF_GRADUATION")
-    private String yearOfGraduation;
+    private Long yearOfGraduation;
     private String organization;
     private String position;
     private Double salary;
@@ -39,6 +39,7 @@ public class AppliedPersonelView {
     private Long applicationId;
     @Column(name="total_workexperience")
     private Double totalExperience;
+    private String qualificationDesc;
 
     public Long getId() {
         return id;
@@ -144,11 +145,11 @@ public class AppliedPersonelView {
         this.university = university;
     }
 
-    public String getYearOfGraduation() {
+    public Long getYearOfGraduation() {
         return yearOfGraduation;
     }
 
-    public void setYearOfGraduation(String yearOfGraduation) {
+    public void setYearOfGraduation(Long yearOfGraduation) {
         this.yearOfGraduation = yearOfGraduation;
     }
 
@@ -254,5 +255,13 @@ public class AppliedPersonelView {
 
     public void setApplicationId(Long applicationId) {
         this.applicationId = applicationId;
+    }
+
+    public String getQualificationDesc() {
+        return qualificationDesc;
+    }
+
+    public void setQualificationDesc(String qualificationDesc) {
+        this.qualificationDesc = qualificationDesc;
     }
 }
