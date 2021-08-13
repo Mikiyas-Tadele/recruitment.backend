@@ -1,11 +1,13 @@
 package com.dbe.services.application.model;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.util.Date;
 
 public class CertificationModel {
     private Long id;
     private String title;
-    private String instution;
+    private String institution;
     private Date awardDate;
     private Long applicantId;
 
@@ -25,12 +27,12 @@ public class CertificationModel {
         this.title = title;
     }
 
-    public String getInstution() {
-        return instution;
+    public String getInstitution() {
+        return institution;
     }
 
-    public void setInstution(String instution) {
-        this.instution = instution;
+    public void setInstitution(String institution) {
+        this.institution = institution;
     }
 
     public Date getAwardDate() {

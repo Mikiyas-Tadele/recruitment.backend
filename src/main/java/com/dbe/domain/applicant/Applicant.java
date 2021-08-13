@@ -30,13 +30,13 @@ public class Applicant {
     private String mPhone2;
     @Column(name="fixedlinephone")
     private String fPhone;
-    @OneToMany(mappedBy = "applicant",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "applicant",cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<EducationalBackground> educationalBackgrounds = new HashSet<>();
-    @OneToMany(mappedBy = "applicant",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "applicant",cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<WorkExperience> workExperiences = new HashSet<>();
-    @OneToMany(mappedBy = "applicant",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "applicant",cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<Application> applications;
-    @OneToMany(mappedBy = "applicant",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "applicant",cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<Certification> certifications=new HashSet<>();
     @Column(name="DISABILITY_DESCRIPTION")
     private String  disabilityDescription;

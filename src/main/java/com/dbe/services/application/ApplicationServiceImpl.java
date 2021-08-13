@@ -23,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.text.ParseException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.time.ZoneId;
 import java.util.*;
 
@@ -151,7 +150,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
                 certificationModel.setApplicantId(certification.getApplicant().getId());
                 certificationModel.setAwardDate(certification.getAwardDate());
                 certificationModel.setTitle(certification.getTitle());
-                certificationModel.setInstution(certification.getInstution());
+                certificationModel.setInstitution(certification.getInstution());
 
                 certificationModels.add(certificationModel);
             }
@@ -204,26 +203,26 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
                 workExperiences.add(workExperience);
             }
-
-            applicant.setWorkExperiences(workExperiences);
+            applicant.getWorkExperiences().clear();
+            applicant.getWorkExperiences().addAll(workExperiences);
         }
     }
 
     private void getCertifications(ApplicantModel applicantModel,Applicant applicant){
-        if(applicantModel.getCertifications().size()>0){
             Set<Certification> certifications=new HashSet<>();
             for (CertificationModel certificationModel:applicantModel.getCertifications()) {
                 Certification certification= certificationModel.getId()!=null?applicantRepository.findApllicantByCertifications(certificationModel.getId()):new Certification();
                 certification.setApplicant(applicant);
                 certification.setAwardDate(certificationModel.getAwardDate());
-                certification.setInstution(certificationModel.getInstution());
+                certification.setInstution(certificationModel.getInstitution());
                 certification.setTitle(certificationModel.getTitle());
 
                 certifications.add(certification);
             }
-
-            applicant.setCertifications(certifications);
-        }
+            if(applicant.getId()!=null){
+                applicant.getCertifications().removeAll(applicant.getCertifications());
+            }
+            applicant.getCertifications().addAll(certifications);
     }
 
     private void getEducationalBackgroundSet(ApplicantModel applicantModel, Applicant applicant) {
@@ -241,7 +240,8 @@ public class ApplicationServiceImpl implements  ApplicationService {
                 educationalBackgrounds.add(educationalBackground);
             }
 
-            applicant.setEducationalBackgrounds(educationalBackgrounds);
+            applicant.getEducationalBackgrounds().clear();
+            applicant.getEducationalBackgrounds().addAll(educationalBackgrounds);
         }
     }
 
