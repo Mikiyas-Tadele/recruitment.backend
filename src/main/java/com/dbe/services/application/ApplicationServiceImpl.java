@@ -293,9 +293,98 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
 
         }
+
         Collections.sort(personelViewList,Comparator.comparing(AppliedPersonelView::getApplicantId));
         return personelViewList;
+
     }
+
+    private List<AppliedPersonelView> getFilteredApplicantProfile(List<AppliedPersonelView> personelViewList ){
+        List<AppliedPersonelView> groupedList=new ArrayList<>();
+        List<WorkExperienceDateModel> workExperienceDateModels=new ArrayList<>();
+        long i=1;
+        for (AppliedPersonelView appliedPersonelView:personelViewList) {
+            AppliedPersonelView appliedPersonel=new AppliedPersonelView();
+            appliedPersonel.setApplicantId(appliedPersonelView.getApplicantId());
+            if(groupedList.size()>0 && groupedList.stream().anyMatch(g->g.getApplicantId().equals(appliedPersonelView.getApplicantId()))){
+                appliedPersonel.setFullName(null);
+                appliedPersonel.setAge(null);
+                appliedPersonel.setDisability(null);
+                appliedPersonel.setGender(null);
+                appliedPersonel.setMobilePhone1(null);
+                appliedPersonel.setMobilePhone2(null);
+                appliedPersonel.setFixedLinePhone(null);
+                appliedPersonel.setUserId(null);
+                appliedPersonel.setEmail(null);
+            }else{
+                appliedPersonel.setId(i++);
+                appliedPersonel.setFullName(appliedPersonelView.getFullName());
+                appliedPersonel.setAge(appliedPersonelView.getAge());
+                appliedPersonel.setDisability(appliedPersonelView.getDisability());
+                appliedPersonel.setGender(appliedPersonelView.getGender());
+                appliedPersonel.setMobilePhone1(appliedPersonelView.getMobilePhone1());
+                appliedPersonel.setMobilePhone2(appliedPersonelView.getMobilePhone2());
+                appliedPersonel.setFixedLinePhone(appliedPersonelView.getFixedLinePhone());
+                appliedPersonel.setUserId(appliedPersonelView.getUserId());
+                appliedPersonel.setEmail(appliedPersonelView.getEmail());
+                appliedPersonel.setApplicationId(appliedPersonelView.getApplicationId());
+                appliedPersonel.setApplicationLetter(appliedPersonelView.getApplicationLetter());
+            }
+
+            if(groupedList.size()>0 &&  (groupedList.stream().anyMatch(e->e.getFieldOfEducation().equals(appliedPersonelView.getFieldOfEducation())
+                    || e.getYearOfGraduation().equals(appliedPersonelView.getYearOfGraduation())))){
+                appliedPersonel.setFieldOfEducation(null);
+                appliedPersonel.setYearOfGraduation(null);
+                appliedPersonel.setCgpa(null);
+                appliedPersonel.setQualificationDesc(null);
+                appliedPersonel.setUniversity(null);
+            }else{
+                appliedPersonel.setFieldOfEducation(appliedPersonelView.getFieldOfEducation());
+                appliedPersonel.setYearOfGraduation(appliedPersonelView.getYearOfGraduation());
+                appliedPersonel.setCgpa(appliedPersonelView.getCgpa());
+                appliedPersonel.setQualificationDesc(appliedPersonelView.getQualificationDesc());
+                appliedPersonel.setUniversity(appliedPersonelView.getUniversity());
+            }
+            if(groupedList.size()>0 && groupedList.stream().anyMatch(e->e.getOrganization()!=null ? e.getOrganization().equals(appliedPersonelView.getOrganization()):false
+                    ||  e.getPosition()!=null? e.getPosition().equals(appliedPersonelView.getPosition()):false)){
+                appliedPersonel.setOrganization(null);
+                appliedPersonel.setPosition(null);
+                appliedPersonel.setSalary(null);
+                appliedPersonel.setStartDate(null);
+                appliedPersonel.setEndDate(null);
+                appliedPersonel.setTotalExperience(null);
+            }else{
+                appliedPersonel.setOrganization(appliedPersonelView.getOrganization());
+                appliedPersonel.setPosition(appliedPersonelView.getPosition());
+                appliedPersonel.setSalary(appliedPersonelView.getSalary());
+                appliedPersonel.setStartDate(appliedPersonelView.getStartDate());
+                appliedPersonel.setEndDate(appliedPersonelView.getEndDate());
+                if(appliedPersonelView.getStartDate()!=null && appliedPersonelView.getEndDate()!=null) {
+                    Applicant applicant = applicantRepository.findOne(appliedPersonelView.getApplicantId());
+                    for (WorkExperience workExperience : applicant.getWorkExperiences()) {
+                        WorkExperienceDateModel workExperienceDateModel = new WorkExperienceDateModel();
+                        workExperienceDateModel.setStartDate(convertToLocalDateTimeViaInstant(workExperience.getStartDate()));
+                        workExperienceDateModel.setEndDate(convertToLocalDateTimeViaInstant(workExperience.getEndDate()));
+                        workExperienceDateModels.add(workExperienceDateModel);
+                    }
+                    appliedPersonel.setTotalExperience(getTotalWorkExperience(workExperienceDateModels));
+                }
+            }
+
+            groupedList.add(appliedPersonel);
+        }
+
+        Collections.sort(groupedList,Comparator.comparing(AppliedPersonelView::getApplicantId).reversed());
+
+        return groupedList;
+    }
+
+
+
+
+
+
+
 
     @Override
     public List<AppliedPersonelView> advanceSearch(SearchModel searchModel) {
@@ -307,6 +396,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
                 .and(AppliedPersonelSpecification.workExperiencePredicate(searchModel.getWorkExperience(),searchModel.getWorkExperienceCriteria()))
                 .and(AppliedPersonelSpecification.graduationYearPredicate(searchModel.getGraduationYear(),searchModel.getGraduationYearCriteria())));
         Collections.sort(appliedPersonelViews,Comparator.comparing(AppliedPersonelView::getApplicantId));
+//        return getFilteredApplicantProfile(appliedPersonelViews);
         return appliedPersonelViews;
     }
 

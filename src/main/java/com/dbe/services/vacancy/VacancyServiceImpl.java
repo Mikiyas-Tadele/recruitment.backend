@@ -112,13 +112,13 @@ public class VacancyServiceImpl implements VacancyService {
         long days = duration.toDays();
         String daysLeft="";
         if(days==1){
-            daysLeft= days + " Day left before closing";
+            daysLeft= days + " Day left before Deadline";
         }
         else if(days>0){
-            daysLeft= days + " Days left before closing";
+            daysLeft= days + " Days left before Deadline";
         }
         else if(days==0){
-            daysLeft=" Today is closing Date";
+            daysLeft=" Today is Deadline Date";
         }else {
             daysLeft =Math.abs(days) + " days has passed since closing";
         }

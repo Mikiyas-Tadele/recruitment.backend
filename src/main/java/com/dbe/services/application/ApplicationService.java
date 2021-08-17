@@ -26,4 +26,5 @@ public interface ApplicationService {
 
     List<AppliedJobView> getAppliedJobs();
 
+
 }
