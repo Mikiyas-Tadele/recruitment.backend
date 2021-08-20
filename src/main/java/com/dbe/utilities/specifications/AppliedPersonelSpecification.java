@@ -30,7 +30,7 @@ public class AppliedPersonelSpecification {
             }
         };
     }
-    public static Specification<AppliedPersonelView> workExperiencePredicate(final Long workExperienceInYears,final String operation){
+    public static Specification<AppliedPersonelView> workExperiencePredicate(final Double workExperienceInYears,final String operation){
         return (root, criteriaQuery, criteriaBuilder) ->{
             if(workExperienceInYears!=null){
                 if(operation.equals("greaterthan"))
@@ -42,7 +42,7 @@ public class AppliedPersonelSpecification {
                     return criteriaBuilder.equal(root.get(AppliedPersonelView_.totalExperience),workExperienceInYears);
                 }
             }else{
-                return criteriaBuilder.greaterThanOrEqualTo(root.get(AppliedPersonelView_.totalExperience),0l);
+                return criteriaBuilder.greaterThanOrEqualTo(root.get(AppliedPersonelView_.totalExperience),0D);
             }
         };
     }

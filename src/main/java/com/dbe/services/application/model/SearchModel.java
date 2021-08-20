@@ -3,7 +3,7 @@ package com.dbe.services.application.model;
 public class SearchModel {
     private Long age;
     private Double cgpa;
-    private Long workExperience;
+    private Double workExperience;
     private String gender;
     private String ageCriteria;
     private String cgpaCriteria;
@@ -29,11 +29,11 @@ public class SearchModel {
         this.cgpa = cgpa;
     }
 
-    public Long getWorkExperience() {
+    public Double getWorkExperience() {
         return workExperience;
     }
 
-    public void setWorkExperience(Long workExperience) {
+    public void setWorkExperience(Double workExperience) {
         this.workExperience = workExperience;
     }
 

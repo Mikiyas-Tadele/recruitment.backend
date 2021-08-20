@@ -84,6 +84,12 @@ public class ApplicationController {
         return  applicationService.advanceSearch(searchModel);
     }
 
+    @PostMapping("/search-excel")
+    public List<AppliedPersonelView> advanceSearchForExcel(@RequestBody SearchModel searchModel){
+        return applicationService.advanceSearchForExcelExport(searchModel);
+    }
+
+
     @GetMapping("/applied-jobs")
     public List<AppliedJobView> getAppliedJobs(){
         return applicationService.getAppliedJobs();

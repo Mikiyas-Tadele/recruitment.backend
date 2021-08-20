@@ -24,6 +24,8 @@ public interface ApplicationService {
 
     List<AppliedPersonelView> advanceSearch(SearchModel searchModel);
 
+    List<AppliedPersonelView> advanceSearchForExcelExport(SearchModel searchModel);
+
     List<AppliedJobView> getAppliedJobs();
 
 

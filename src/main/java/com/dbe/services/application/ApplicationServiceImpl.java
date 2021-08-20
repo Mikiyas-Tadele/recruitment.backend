@@ -253,7 +253,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
         Applicant applicant=applicantRepository.findApplicantByUserId(userEntity.get().getId());
 
          if(applicant==null){
-             throw  new ApplicationException("Please add your Information and also Upload a CV!");
+             throw  new ApplicationException("Please fill your profile before applying!");
          }
 
          Application existingApplication=applicationRepository.findByApplicantAndVacancy(applicant.getId(),model.getVacancyId());
@@ -299,6 +299,12 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
     }
 
+
+    @Override
+    public List<AppliedPersonelView> advanceSearchForExcelExport(SearchModel searchModel) {
+        return getFilteredApplicantProfile(advanceSearch(searchModel));
+    }
+
     private List<AppliedPersonelView> getFilteredApplicantProfile(List<AppliedPersonelView> personelViewList ){
         List<AppliedPersonelView> groupedList=new ArrayList<>();
         List<WorkExperienceDateModel> workExperienceDateModels=new ArrayList<>();
@@ -332,7 +338,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
             }
 
             if(groupedList.size()>0 &&  (groupedList.stream().anyMatch(e->e.getFieldOfEducation().equals(appliedPersonelView.getFieldOfEducation())
-                    || e.getYearOfGraduation().equals(appliedPersonelView.getYearOfGraduation())))){
+                    && e.getYearOfGraduation().equals(appliedPersonelView.getYearOfGraduation())))){
                 appliedPersonel.setFieldOfEducation(null);
                 appliedPersonel.setYearOfGraduation(null);
                 appliedPersonel.setCgpa(null);
@@ -345,8 +351,8 @@ public class ApplicationServiceImpl implements  ApplicationService {
                 appliedPersonel.setQualificationDesc(appliedPersonelView.getQualificationDesc());
                 appliedPersonel.setUniversity(appliedPersonelView.getUniversity());
             }
-            if(groupedList.size()>0 && groupedList.stream().anyMatch(e->e.getOrganization()!=null ? e.getOrganization().equals(appliedPersonelView.getOrganization()):false
-                    ||  e.getPosition()!=null? e.getPosition().equals(appliedPersonelView.getPosition()):false)){
+            if(groupedList.size()>0 && groupedList.stream().anyMatch(e->e.getOrganization().equals(appliedPersonelView.getOrganization())
+                    && e.getPosition().equals(appliedPersonelView.getPosition()))){
                 appliedPersonel.setOrganization(null);
                 appliedPersonel.setPosition(null);
                 appliedPersonel.setSalary(null);
@@ -378,11 +384,6 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
         return groupedList;
     }
-
-
-
-
-
 
 
 

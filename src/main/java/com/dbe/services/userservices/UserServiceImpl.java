@@ -110,7 +110,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void registerUser(UserModel userModel) throws UnsupportedEncodingException, MessagingException {
+    public void registerUser(UserModel userModel) {
         if (userRepository.existsByUsername(userModel.getEmail())) {
             throw new RuntimeException("Fail -> Username is already taken!");
         }
@@ -126,7 +126,13 @@ public class UserServiceImpl implements UserService {
         userEntity.setRoles(roles);
         userRepository.save(userEntity);
 
-        sendVerificationEmail(userEntity);
+        try {
+            sendVerificationEmail(userEntity);
+        } catch (UnsupportedEncodingException e) {
+            throw  new 
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
     }
 
     private void getRolesToSave(UserModel userModel, Set<Role> roles) {

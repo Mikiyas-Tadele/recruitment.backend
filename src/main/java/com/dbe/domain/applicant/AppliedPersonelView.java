@@ -21,7 +21,7 @@ public class AppliedPersonelView {
     @Column(name="FIELD_OF_EDUCATION")
     private String fieldOfEducation;
     private Double cgpa;
-    private String qualification;
+    private Long qualification;
     private String university;
     @Column(name="YEAR_OF_GRADUATION")
     private Long yearOfGraduation;
@@ -129,11 +129,11 @@ public class AppliedPersonelView {
         this.cgpa = cgpa;
     }
 
-    public String getQualification() {
+    public Long getQualification() {
         return qualification;
     }
 
-    public void setQualification(String qualification) {
+    public void setQualification(Long qualification) {
         this.qualification = qualification;
     }
 
