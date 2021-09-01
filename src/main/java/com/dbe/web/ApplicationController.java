@@ -2,7 +2,9 @@ package com.dbe.web;
 
 import com.dbe.domain.applicant.AppliedJobView;
 import com.dbe.domain.applicant.AppliedPersonelView;
+import com.dbe.domain.internal_vacancy.InternalApplicantByPositionView;
 import com.dbe.domain.internal_vacancy.InternalApplicationView;
+import com.dbe.domain.internal_vacancy.InternalPositionByApplicantView;
 import com.dbe.services.application.ApplicationService;
 import com.dbe.services.application.model.ApplicantModel;
 import com.dbe.services.application.model.ApplicationModel;
@@ -50,13 +52,14 @@ public class ApplicationController {
     }
 
     @RequestMapping("/internal-application-store")
-    public void storeInternalApplication(@RequestParam MultipartFile[] file,@RequestParam Long applicationId){
-        applicationService.storeInternalApplicationFile(file,applicationId);
+    public void storeInternalApplication(@RequestParam MultipartFile file,@RequestParam Long vacancyId){
+        applicationService.storeInternalApplicationFile(file,vacancyId);
     }
 
     @RequestMapping("/download-Internal-applicant-File")
-    public ResponseEntity<Resource> download(@RequestParam Long applicationId, HttpServletRequest request) {
-        Resource resource = storageService.loadAsResource(applicationId);
+    public ResponseEntity<Resource> downloadInternalApplicantFile(@RequestParam Long employeeId,@RequestParam Long vacancyId,
+                                             HttpServletRequest request) {
+        Resource resource = storageService.loadInternalApplicantFileAsResource(employeeId,vacancyId);
 
         // Try to determine file's content type
         String contentType = null;
@@ -133,5 +136,15 @@ public class ApplicationController {
     @GetMapping("/internalApplications/{id}")
     List<InternalApplicationView> getInternalApplicationsByVacancy(@PathVariable Long id){
         return  applicationService.getInternalApplicationByVacancy(id);
+    }
+
+    @GetMapping("/internalApplicantsByPosition")
+    List<InternalApplicantByPositionView> getInternalApplicantsByPosition(){
+        return applicationService.getApplicantsByPosition();
+    }
+
+    @GetMapping("/internalPositionByApplicant")
+    List<InternalPositionByApplicantView> getInternalPositionByApplicant(){
+        return applicationService.getPositionByApplicant();
     }
 }

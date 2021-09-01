@@ -3,17 +3,16 @@ package com.dbe.domain.internal_vacancy;
 import javax.persistence.*;
 
 @Entity
-@Table(name="internal_application_file",schema = "recruitmentDB")
+@Table(name="INTERNAL_APPLICANT_FILE",schema = "recruitmentDB")
 public class InternalApplicationFile {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "iApp_ID")
-    @SequenceGenerator(name = "iApp_ID",schema = "recruitmentDB",allocationSize =1,sequenceName = "IAPP_SEQ_ID")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "iApp_ID")
+    @SequenceGenerator(name = "iApp_ID", schema = "recruitmentDB", allocationSize = 1, sequenceName = "IAPP_SEQ_ID")
     private Long id;
     private String fileName;
     private Long fileSize;
-    @ManyToOne
-    @JoinColumn(name="applicationId",referencedColumnName = "id")
-    private InternalApplication application;
+    private Long employeeId;
+    private Long vacancyId;
 
     public Long getId() {
         return id;
@@ -39,11 +38,19 @@ public class InternalApplicationFile {
         this.fileSize = fileSize;
     }
 
-    public InternalApplication getApplication() {
-        return application;
+    public Long getEmployeeId() {
+        return employeeId;
     }
 
-    public void setApplication(InternalApplication application) {
-        this.application = application;
+    public void setEmployeeId(Long employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    public Long getVacancyId() {
+        return vacancyId;
+    }
+
+    public void setVacancyId(Long vacancyId) {
+        this.vacancyId = vacancyId;
     }
 }

@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class FileStorageServiceImpl implements FileStorageService {
@@ -54,7 +55,8 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     @Override
     public FileModel store(MultipartFile file, FileModel fileModel) {
-        String filename = StringUtils.cleanPath(file.getOriginalFilename());
+        String uniqueID = UUID.randomUUID().toString();
+        String filename = uniqueID+StringUtils.cleanPath(file.getOriginalFilename());
         fileModel.setFileName(filename);
         try {
             if (file.isEmpty()) {
@@ -95,8 +97,8 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
 
     @Override
-    public Resource loadAsResource(Long applicationId) {
-        InternalApplicationFile applicantFile=internalApplicationFileRepository.findbyApplicationId(applicationId);
+    public Resource loadInternalApplicantFileAsResource(Long employeeId, Long vacancyId) {
+        InternalApplicationFile applicantFile=internalApplicationFileRepository.findbyEmployeeAndVacancy(employeeId,vacancyId);
         return getResource(applicantFile.getFileName());
     }
 

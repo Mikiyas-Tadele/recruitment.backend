@@ -16,7 +16,7 @@ public interface FileStorageService {
 
     Resource loadAsResource(Long fileId, Long applicationId);
 
-    Resource loadAsResource(Long applicationId);
+    Resource loadInternalApplicantFileAsResource(Long employeeId, Long vacancyId);
 
     void delete(Long fileId, Long fileTypeId);
 

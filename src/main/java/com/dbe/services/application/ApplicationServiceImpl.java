@@ -76,6 +76,12 @@ public class ApplicationServiceImpl implements  ApplicationService {
     @Autowired
     private InternalApplicationFileRepository internalApplicationFileRepository;
 
+    @Autowired
+    private InternalApplicantByPositionViewRepository internalApplicantByPositionViewRepository;
+
+    @Autowired
+    private InternalPositionByApplicantViewRepository internalPositionByApplicantViewRepository;
+
 
 
     @Override
@@ -207,18 +213,21 @@ public class ApplicationServiceImpl implements  ApplicationService {
     }
 
     @Override
-    public void storeInternalApplicationFile(MultipartFile[] files, Long applicationId) {
+    public void storeInternalApplicationFile(MultipartFile file, Long vacancyId) {
+        IAuthenticationFacade authenticationFacade= new AuthenticationFacade();
+        UserPrinciple authentication= (UserPrinciple) authenticationFacade.getAuthentication().getPrincipal();
+        Optional<UserEntity> userEntity= userRepository.findByUsernameAndEnabled(authentication.getUsername(),true);
+        Employee  employee=employeeRepository.findByEmail(userEntity.get().getUsername());
         FileModel fileModel = new FileModel();
-        for (MultipartFile file:files) {
             fileModel.setFileName(StringUtils.cleanPath(file.getOriginalFilename()));
             fileModel.setFileSize(file.getSize());
             storageService.store(file, fileModel);
             InternalApplicationFile applicantFile=new InternalApplicationFile();
             applicantFile.setFileName(fileModel.getFileName());
             applicantFile.setFileSize(fileModel.getFileSize());
-            applicantFile.setApplication(internalApplicationRepository.findOne(applicationId));
+            applicantFile.setEmployeeId(employee.getEmployeeId());
+            applicantFile.setVacancyId(vacancyId);
             internalApplicationFileRepository.save(applicantFile);
-        }
     }
 
     private void getWorkExperiences(ApplicantModel applicantModel, Applicant applicant) {
@@ -491,10 +500,22 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
             internalApplicationRepository.save(internalApplication);
         }
+
+
     }
 
     @Override
     public List<InternalApplicationView> getInternalApplicationByVacancy(Long vacancyId) {
         return internalApplicationViewRepository.findByVacancyId(vacancyId);
+    }
+
+    @Override
+    public List<InternalApplicantByPositionView> getApplicantsByPosition() {
+        return internalApplicantByPositionViewRepository.findAll();
+    }
+
+    @Override
+    public List<InternalPositionByApplicantView> getPositionByApplicant() {
+        return internalPositionByApplicantViewRepository.findAll();
     }
 }
