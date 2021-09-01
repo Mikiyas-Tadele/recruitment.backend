@@ -1,7 +1,9 @@
 package com.dbe.utilities.file_services;
 
 import com.dbe.domain.applicant.ApplicantFile;
+import com.dbe.domain.internal_vacancy.InternalApplicationFile;
 import com.dbe.repositories.applicant.ApplicantFileRepository;
+import com.dbe.repositories.internal_vacancy.InternalApplicationFileRepository;
 import com.dbe.utilities.exception.StorageException;
 import com.dbe.utilities.exception.StorageFileNotFoundException;
 import com.dbe.utilities.models.SystemConstants;
@@ -25,11 +27,15 @@ import java.util.List;
 public class FileStorageServiceImpl implements FileStorageService {
     private final Path rootLocation;
     private ApplicantFileRepository applicantFileRepository;
+    private InternalApplicationFileRepository internalApplicationFileRepository;
 
     @Autowired
-    public FileStorageServiceImpl(StorageProperties properties, ApplicantFileRepository applicantFileRepository) {
+    public FileStorageServiceImpl(StorageProperties properties,
+                                  ApplicantFileRepository applicantFileRepository,
+                                  InternalApplicationFileRepository internalApplicationFileRepository) {
         this.applicantFileRepository=applicantFileRepository;
         this.rootLocation= Paths.get(properties.getLocation());
+        this.internalApplicationFileRepository=internalApplicationFileRepository;
         init();
     }
 
@@ -85,20 +91,30 @@ public class FileStorageServiceImpl implements FileStorageService {
     public Resource loadAsResource(Long userId, Long applicationId) {
         ApplicantFile researchFile=applicationId!=0?applicantFileRepository.findByApplicationId(applicationId):
                 applicantFileRepository.findByUserId(userId, SystemConstants.CV_FILE);
+        return getResource(researchFile.getFileName());
+    }
+
+    @Override
+    public Resource loadAsResource(Long applicationId) {
+        InternalApplicationFile applicantFile=internalApplicationFileRepository.findbyApplicationId(applicationId);
+        return getResource(applicantFile.getFileName());
+    }
+
+    private Resource getResource(String fileName) {
         try {
-            Path file = rootLocation.resolve(researchFile.getFileName());
+            Path file = rootLocation.resolve(fileName);
             Resource resource = new UrlResource(file.toUri());
             if (resource.exists() || resource.isReadable()) {
                 return resource;
             }
             else {
                 throw new StorageFileNotFoundException(
-                        "Could not read file: " + researchFile.getFileName());
+                        "Could not read file: " + fileName);
 
             }
         }
         catch (MalformedURLException e) {
-            throw new StorageFileNotFoundException("Could not read file: " + researchFile.getFileName(), e);
+            throw new StorageFileNotFoundException("Could not read file: " + fileName, e);
         }
     }
 

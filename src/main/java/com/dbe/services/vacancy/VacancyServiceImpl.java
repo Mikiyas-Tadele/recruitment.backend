@@ -1,9 +1,12 @@
 package com.dbe.services.vacancy;
 
+import com.dbe.domain.internal_vacancy.InternalVacancy;
 import com.dbe.domain.vacancy.Vacancy;
 import com.dbe.domain.vacancy.VacancyDetail;
+import com.dbe.repositories.internal_vacancy.InternalVacancyRepository;
 import com.dbe.repositories.vacancyRepository.VacancyDetailRepository;
 import com.dbe.repositories.vacancyRepository.VacancyRepository;
+import com.dbe.services.vacancy.model.InternalVacancyModel;
 import com.dbe.services.vacancy.model.VacancyModel;
 import com.dbe.services.vacancy.model.VacancyModelDetail;
 import com.dbe.utilities.models.SystemConstants;
@@ -23,6 +26,8 @@ public class VacancyServiceImpl implements VacancyService {
     private VacancyRepository vacancyRepository;
     @Autowired
     private VacancyDetailRepository vacancyDetailRepository;
+    @Autowired
+    private InternalVacancyRepository internalVacancyRepository;
 
     @Override
     public VacancyModel addOrUpdateVacancyDetail(VacancyModel vacancyModel) {
@@ -193,5 +198,78 @@ public class VacancyServiceImpl implements VacancyService {
         if(change){
             vacancyRepository.save(vacancies);
         }
+    }
+
+    @Override
+    public List<InternalVacancyModel> getAllInternalVacancies() {
+        List<InternalVacancyModel> vacancyModels=new ArrayList<>();
+        Iterable<InternalVacancy> internalVacancies=internalVacancyRepository.findAll();
+        getInternalVacancyModel(vacancyModels, internalVacancies);
+
+        return vacancyModels;
+    }
+
+    @Override
+    public List<InternalVacancyModel> getALLInternalVacanciesByPlacement(String placement) {
+        List<InternalVacancyModel> vacancyModels=new ArrayList<>();
+        Iterable<InternalVacancy> internalVacancies=internalVacancyRepository.findByPlacementOfWork(placement);
+        getInternalVacancyModel(vacancyModels, internalVacancies);
+
+        return vacancyModels;
+    }
+
+    private void getInternalVacancyModel(List<InternalVacancyModel> vacancyModels, Iterable<InternalVacancy> internalVacancies) {
+        for (InternalVacancy internalVacancy:internalVacancies) {
+            InternalVacancyModel vacancyModel=new InternalVacancyModel();
+            vacancyModel.setId(internalVacancy.getId());
+            vacancyModel.setJobGrade(internalVacancy.getJobGrade());
+            vacancyModel.setNoRequired(internalVacancy.getNoRequired());
+            vacancyModel.setEndDate(internalVacancy.getEndDate());
+            vacancyModel.setPostDate(internalVacancy.getPostDate());
+            vacancyModel.setPosition(internalVacancy.getPosition());
+            vacancyModel.setPlacementOfWork(internalVacancy.getPlacementOfWork());
+            vacancyModel.setQualifications(internalVacancy.getQualifications());
+
+            vacancyModels.add(vacancyModel);
+        }
+    }
+
+    @Override
+    public InternalVacancyModel getInternalVacancyGivenId(Long id) {
+
+        InternalVacancy internalVacancy=internalVacancyRepository.findOne(id);
+
+        InternalVacancyModel vacancyModel=new InternalVacancyModel();
+        vacancyModel.setId(internalVacancy.getId());
+        vacancyModel.setJobGrade(internalVacancy.getJobGrade());
+        vacancyModel.setNoRequired(internalVacancy.getNoRequired());
+        vacancyModel.setEndDate(internalVacancy.getEndDate());
+        vacancyModel.setPostDate(internalVacancy.getPostDate());
+        vacancyModel.setPosition(internalVacancy.getPosition());
+        vacancyModel.setPlacementOfWork(internalVacancy.getPlacementOfWork());
+        vacancyModel.setQualifications(internalVacancy.getQualifications());
+
+        return vacancyModel;
+    }
+
+    @Override
+    public void addOrUpdateInternalVacancy(InternalVacancyModel internalVacancyModel) {
+     InternalVacancy internalVacancy=internalVacancyModel.getId()!=null?
+             internalVacancyRepository.findOne(internalVacancyModel.getId()):
+             new InternalVacancy();
+        internalVacancy.setJobGrade(internalVacancyModel.getJobGrade());
+        internalVacancy.setNoRequired(internalVacancyModel.getNoRequired());
+        internalVacancy.setEndDate(internalVacancyModel.getEndDate());
+        internalVacancy.setPostDate(internalVacancyModel.getPostDate());
+        internalVacancy.setPosition(internalVacancyModel.getPosition());
+        internalVacancy.setPlacementOfWork(internalVacancyModel.getPlacementOfWork());
+        internalVacancy.setQualifications(internalVacancyModel.getQualifications());
+
+        internalVacancyRepository.save(internalVacancy);
+    }
+
+    @Override
+    public void deleteInternalVacancy(Long id) {
+
     }
 }

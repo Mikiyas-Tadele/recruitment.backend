@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.swing.text.StyledEditorKit;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -23,6 +24,8 @@ public class UserPrinciple implements UserDetails {
 
     private Boolean enabled;
 
+    private Boolean staff;
+
     @JsonIgnore
     private String password;
 
@@ -30,7 +33,7 @@ public class UserPrinciple implements UserDetails {
 
 
     public UserPrinciple(Long id, String name,
-                         String email, String password,Boolean enabled,
+                         String email, String password,Boolean enabled,Boolean staff,
                          Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.name = name;
@@ -38,6 +41,7 @@ public class UserPrinciple implements UserDetails {
         this.password = password;
         this.authorities = authorities;
         this.enabled=enabled;
+        this.staff=staff;
 
     }
 
@@ -53,6 +57,7 @@ public class UserPrinciple implements UserDetails {
                 userEntity.getUsername(),
                 userEntity.getPassword(),
                 userEntity.getEnabled(),
+                userEntity.getStaff(),
                 authorities
         );
     }
@@ -109,5 +114,13 @@ public class UserPrinciple implements UserDetails {
         
         UserPrinciple user = (UserPrinciple) o;
         return Objects.equals(id, user.id);
+    }
+
+    public Boolean getStaff() {
+        return staff;
+    }
+
+    public void setStaff(Boolean staff) {
+        this.staff = staff;
     }
 }

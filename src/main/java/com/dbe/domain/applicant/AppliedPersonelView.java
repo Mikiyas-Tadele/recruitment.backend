@@ -40,6 +40,8 @@ public class AppliedPersonelView {
     @Column(name="total_workexperience")
     private Double totalExperience;
     private String qualificationDesc;
+    @Column(name="APPLIED_DATE")
+    private Date appliedDate;
 
     public Long getId() {
         return id;
@@ -263,5 +265,13 @@ public class AppliedPersonelView {
 
     public void setQualificationDesc(String qualificationDesc) {
         this.qualificationDesc = qualificationDesc;
+    }
+
+    public Date getAppliedDate() {
+        return appliedDate;
+    }
+
+    public void setAppliedDate(Date appliedDate) {
+        this.appliedDate = appliedDate;
     }
 }

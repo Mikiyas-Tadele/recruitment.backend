@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService {
             UserEntity userEntity = new UserEntity();
             userEntity.setFullName(userModel.getFullName());
             userEntity.setUsername(userModel.getEmail());
-            userEntity.setPassword(passwordEncoder.encode(SystemConstants.RESET_PASSWORD));
+            userEntity.setPassword(passwordEncoder.encode(userModel.getPassword()));
             Set<Role> roles = new HashSet<>();
             if (userModel.getRoles() != null) {
                 getRolesToSave(userModel, roles);
@@ -117,7 +117,7 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = new UserEntity();
         userEntity.setFullName(userModel.getFullName());
         userEntity.setUsername(userModel.getEmail());
-        userEntity.setPassword(passwordEncoder.encode(SystemConstants.RESET_PASSWORD));
+        userEntity.setPassword(passwordEncoder.encode(userModel.getPassword()));
         userEntity.setEnabled(false);
         userEntity.setLastLoggedIn(new Date());
         Set<Role> roles = new HashSet<>();
@@ -129,9 +129,9 @@ public class UserServiceImpl implements UserService {
         try {
             sendVerificationEmail(userEntity);
         } catch (UnsupportedEncodingException e) {
-            throw  new 
+            throw  new RuntimeException("An invalid email is entered or unable to connect to email server");
         } catch (MessagingException e) {
-            e.printStackTrace();
+            throw  new RuntimeException("An invalid email is entered or unable to connect to email server");
         }
     }
 
@@ -268,7 +268,7 @@ public class UserServiceImpl implements UserService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = jwtProvider.generateJwtToken(authentication);
-        return new JwtResponse(jwt, principal.getAuthorities(), principal.getName(), principal.getUsername());
+        return new JwtResponse(jwt, principal.getAuthorities(), principal.getName(), principal.getUsername(),principal.getStaff());
     }
 
     @Override
@@ -290,6 +290,7 @@ public class UserServiceImpl implements UserService {
           if(!LocalDate.now().isAfter(localDate)){
               UserEntity userEntity=verificationToken.getUserEntity();
               userEntity.setEnabled(true);
+              userEntity.setStaff(userEntity.getUsername().contains("dbe.com.et"));
               userRepository.save(userEntity);
               verificationTokenRepository.delete(verificationToken.getId());
           }
@@ -340,7 +341,7 @@ public class UserServiceImpl implements UserService {
         helper.setSubject(subject);
 
         content = content.replace("[[name]]", userEntity.getFullName());
-        String verifyURL = SystemConstants.PROD_VERIFICATION_URL + verificationToken.getToken();
+        String verifyURL = SystemConstants.VERIFICATION_URL + verificationToken.getToken();
 
         content = content.replace("[[URL]]", verifyURL);
 

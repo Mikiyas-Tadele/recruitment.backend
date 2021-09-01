@@ -2,6 +2,7 @@ package com.dbe.web;
 
 import com.dbe.domain.vacancy.Vacancy;
 import com.dbe.services.vacancy.VacancyService;
+import com.dbe.services.vacancy.model.InternalVacancyModel;
 import com.dbe.services.vacancy.model.VacancyModel;
 import com.dbe.services.vacancy.model.VacancyModelDetail;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,5 +51,25 @@ public class VacancyController {
     @GetMapping("/active-vacancies")
     public List<VacancyModel> getAllActiveVacancies(){
         return vacancyService.getAllActiveVacancies();
+    }
+
+    @PostMapping("/internal-vacancy")
+    public void addOrUpdateInternalVacancy(@RequestBody InternalVacancyModel internalVacancyModel){
+        vacancyService.addOrUpdateInternalVacancy(internalVacancyModel);
+    }
+
+    @GetMapping("/internal-vacancies")
+    public List<InternalVacancyModel> getInternalVacancies(){
+        return  vacancyService.getAllInternalVacancies();
+    }
+
+    @GetMapping("/internal-vacancies/{placement}")
+    public List<InternalVacancyModel> getAllVacanciesByPlacement(@PathVariable String placement){
+        return vacancyService.getALLInternalVacanciesByPlacement(placement);
+    }
+
+    @GetMapping("/internal-vacancy/{id}")
+    public InternalVacancyModel getInternalVacancy(@PathVariable Long id){
+        return vacancyService.getInternalVacancyGivenId(id);
     }
 }

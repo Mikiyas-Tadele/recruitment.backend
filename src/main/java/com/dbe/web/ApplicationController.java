@@ -2,6 +2,7 @@ package com.dbe.web;
 
 import com.dbe.domain.applicant.AppliedJobView;
 import com.dbe.domain.applicant.AppliedPersonelView;
+import com.dbe.domain.internal_vacancy.InternalApplicationView;
 import com.dbe.services.application.ApplicationService;
 import com.dbe.services.application.model.ApplicantModel;
 import com.dbe.services.application.model.ApplicationModel;
@@ -47,6 +48,35 @@ public class ApplicationController {
         applicationService.storeFile(file, applicationId);
 
     }
+
+    @RequestMapping("/internal-application-store")
+    public void storeInternalApplication(@RequestParam MultipartFile[] file,@RequestParam Long applicationId){
+        applicationService.storeInternalApplicationFile(file,applicationId);
+    }
+
+    @RequestMapping("/download-Internal-applicant-File")
+    public ResponseEntity<Resource> download(@RequestParam Long applicationId, HttpServletRequest request) {
+        Resource resource = storageService.loadAsResource(applicationId);
+
+        // Try to determine file's content type
+        String contentType = null;
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            throw new StorageException("Could not determine file type.");
+        }
+
+        // Fallback to the default content type if type could not be determined
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+    }
+
     @PostMapping("/apply")
     public ApplicationModel applyForPosition(@RequestBody ApplicationModel applicationModel){
        return applicationService.applyForPosition(applicationModel);
@@ -93,5 +123,15 @@ public class ApplicationController {
     @GetMapping("/applied-jobs")
     public List<AppliedJobView> getAppliedJobs(){
         return applicationService.getAppliedJobs();
+    }
+
+    @PostMapping("/internalApplication")
+    public void applyForInternalPosition(@RequestBody Long[] ids){
+        applicationService.applyForInternalPositions(ids);
+    }
+
+    @GetMapping("/internalApplications/{id}")
+    List<InternalApplicationView> getInternalApplicationsByVacancy(@PathVariable Long id){
+        return  applicationService.getInternalApplicationByVacancy(id);
     }
 }

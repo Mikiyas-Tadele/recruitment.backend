@@ -2,6 +2,7 @@ package com.dbe.services.application;
 
 import com.dbe.domain.applicant.AppliedJobView;
 import com.dbe.domain.applicant.AppliedPersonelView;
+import com.dbe.domain.internal_vacancy.InternalApplicationView;
 import com.dbe.services.application.model.ApplicantModel;
 import com.dbe.services.application.model.ApplicationModel;
 import com.dbe.services.application.model.SearchModel;
@@ -18,6 +19,8 @@ public interface ApplicationService {
 
     void storeFile(MultipartFile file, Long applicationId);
 
+    void storeInternalApplicationFile(MultipartFile[] file,Long applicationId);
+
     ApplicationModel applyForPosition(ApplicationModel model);
 
     List<AppliedPersonelView> appliedPersonelForVacancy(Long vacancyId) throws ParseException;
@@ -27,6 +30,12 @@ public interface ApplicationService {
     List<AppliedPersonelView> advanceSearchForExcelExport(SearchModel searchModel);
 
     List<AppliedJobView> getAppliedJobs();
+
+    void applyForInternalPositions(Long[] ids);
+
+    List<InternalApplicationView> getInternalApplicationByVacancy(Long vacancyId);
+
+
 
 
 }

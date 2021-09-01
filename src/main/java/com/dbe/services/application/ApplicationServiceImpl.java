@@ -1,8 +1,10 @@
 package com.dbe.services.application;
 
 import com.dbe.domain.applicant.*;
+import com.dbe.domain.internal_vacancy.*;
 import com.dbe.domain.security.UserEntity;
 import com.dbe.repositories.applicant.*;
+import com.dbe.repositories.internal_vacancy.*;
 import com.dbe.repositories.security.UserRepository;
 import com.dbe.repositories.vacancyRepository.VacancyRepository;
 import com.dbe.security.services.UserPrinciple;
@@ -58,6 +60,21 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
     @Autowired
     private SettingService settingService;
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private InternalApplicationRepository internalApplicationRepository;
+
+    @Autowired
+    private InternalVacancyRepository internalVacancyRepository;
+
+    @Autowired
+    private InternalApplicationViewRepository internalApplicationViewRepository;
+
+    @Autowired
+    private InternalApplicationFileRepository internalApplicationFileRepository;
 
 
 
@@ -189,6 +206,21 @@ public class ApplicationServiceImpl implements  ApplicationService {
        applicantFileRepository.save(applicantFile);
     }
 
+    @Override
+    public void storeInternalApplicationFile(MultipartFile[] files, Long applicationId) {
+        FileModel fileModel = new FileModel();
+        for (MultipartFile file:files) {
+            fileModel.setFileName(StringUtils.cleanPath(file.getOriginalFilename()));
+            fileModel.setFileSize(file.getSize());
+            storageService.store(file, fileModel);
+            InternalApplicationFile applicantFile=new InternalApplicationFile();
+            applicantFile.setFileName(fileModel.getFileName());
+            applicantFile.setFileSize(fileModel.getFileSize());
+            applicantFile.setApplication(internalApplicationRepository.findOne(applicationId));
+            internalApplicationFileRepository.save(applicantFile);
+        }
+    }
+
     private void getWorkExperiences(ApplicantModel applicantModel, Applicant applicant) {
         if(applicantModel.getWorkExperiences().size()>0){
             Set<WorkExperience> workExperiences=new HashSet<>();
@@ -307,11 +339,11 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
     private List<AppliedPersonelView> getFilteredApplicantProfile(List<AppliedPersonelView> personelViewList ){
         List<AppliedPersonelView> groupedList=new ArrayList<>();
-        List<WorkExperienceDateModel> workExperienceDateModels=new ArrayList<>();
         long i=1;
         for (AppliedPersonelView appliedPersonelView:personelViewList) {
             AppliedPersonelView appliedPersonel=new AppliedPersonelView();
             appliedPersonel.setApplicantId(appliedPersonelView.getApplicantId());
+            appliedPersonel.setAppliedDate(appliedPersonelView.getAppliedDate());
             if(groupedList.size()>0 && groupedList.stream().anyMatch(g->g.getApplicantId().equals(appliedPersonelView.getApplicantId()))){
                 appliedPersonel.setFullName(null);
                 appliedPersonel.setAge(null);
@@ -337,8 +369,8 @@ public class ApplicationServiceImpl implements  ApplicationService {
                 appliedPersonel.setApplicationLetter(appliedPersonelView.getApplicationLetter());
             }
 
-            if(groupedList.size()>0 &&  (groupedList.stream().anyMatch(e->e.getFieldOfEducation().equals(appliedPersonelView.getFieldOfEducation())
-                    && e.getYearOfGraduation().equals(appliedPersonelView.getYearOfGraduation())))){
+            if(groupedList.size()>0 &&  (groupedList.stream().anyMatch(e->e.getFieldOfEducation()!=null && e.getFieldOfEducation().equals(appliedPersonelView.getFieldOfEducation())
+                    && e.getYearOfGraduation()!=null && e.getYearOfGraduation().equals(appliedPersonelView.getYearOfGraduation())))){
                 appliedPersonel.setFieldOfEducation(null);
                 appliedPersonel.setYearOfGraduation(null);
                 appliedPersonel.setCgpa(null);
@@ -351,36 +383,39 @@ public class ApplicationServiceImpl implements  ApplicationService {
                 appliedPersonel.setQualificationDesc(appliedPersonelView.getQualificationDesc());
                 appliedPersonel.setUniversity(appliedPersonelView.getUniversity());
             }
-            if(groupedList.size()>0 && groupedList.stream().anyMatch(e->e.getOrganization().equals(appliedPersonelView.getOrganization())
-                    && e.getPosition().equals(appliedPersonelView.getPosition()))){
-                appliedPersonel.setOrganization(null);
-                appliedPersonel.setPosition(null);
-                appliedPersonel.setSalary(null);
-                appliedPersonel.setStartDate(null);
-                appliedPersonel.setEndDate(null);
-                appliedPersonel.setTotalExperience(null);
-            }else{
-                appliedPersonel.setOrganization(appliedPersonelView.getOrganization());
-                appliedPersonel.setPosition(appliedPersonelView.getPosition());
-                appliedPersonel.setSalary(appliedPersonelView.getSalary());
-                appliedPersonel.setStartDate(appliedPersonelView.getStartDate());
-                appliedPersonel.setEndDate(appliedPersonelView.getEndDate());
-                if(appliedPersonelView.getStartDate()!=null && appliedPersonelView.getEndDate()!=null) {
-                    Applicant applicant = applicantRepository.findOne(appliedPersonelView.getApplicantId());
-                    for (WorkExperience workExperience : applicant.getWorkExperiences()) {
-                        WorkExperienceDateModel workExperienceDateModel = new WorkExperienceDateModel();
-                        workExperienceDateModel.setStartDate(convertToLocalDateTimeViaInstant(workExperience.getStartDate()));
-                        workExperienceDateModel.setEndDate(convertToLocalDateTimeViaInstant(workExperience.getEndDate()));
-                        workExperienceDateModels.add(workExperienceDateModel);
+            if(appliedPersonelView.getOrganization()!=null && appliedPersonelView.getPosition()!=null) {
+                if (groupedList.size() > 0 && groupedList.stream().anyMatch(e -> e.getOrganization() !=null && e.getOrganization().equals(appliedPersonelView.getOrganization())
+                        && e.getPosition()!=null && e.getPosition().equals(appliedPersonelView.getPosition()))) {
+                    appliedPersonel.setOrganization(null);
+                    appliedPersonel.setPosition(null);
+                    appliedPersonel.setSalary(null);
+                    appliedPersonel.setStartDate(null);
+                    appliedPersonel.setEndDate(null);
+                    appliedPersonel.setTotalExperience(null);
+                } else {
+                    appliedPersonel.setOrganization(appliedPersonelView.getOrganization());
+                    appliedPersonel.setPosition(appliedPersonelView.getPosition());
+                    appliedPersonel.setSalary(appliedPersonelView.getSalary());
+                    appliedPersonel.setStartDate(appliedPersonelView.getStartDate());
+                    appliedPersonel.setEndDate(appliedPersonelView.getEndDate());
+                    if (appliedPersonelView.getStartDate() != null && appliedPersonelView.getEndDate() != null) {
+                        List<WorkExperienceDateModel> workExperienceDateModels=new ArrayList<>();
+                        Applicant applicant = applicantRepository.findOne(appliedPersonelView.getApplicantId());
+                        for (WorkExperience workExperience : applicant.getWorkExperiences()) {
+                            WorkExperienceDateModel workExperienceDateModel = new WorkExperienceDateModel();
+                            workExperienceDateModel.setStartDate(convertToLocalDateTimeViaInstant(workExperience.getStartDate()));
+                            workExperienceDateModel.setEndDate(convertToLocalDateTimeViaInstant(workExperience.getEndDate()));
+                            workExperienceDateModels.add(workExperienceDateModel);
+                        }
+                        appliedPersonel.setTotalExperience(getTotalWorkExperience(workExperienceDateModels));
                     }
-                    appliedPersonel.setTotalExperience(getTotalWorkExperience(workExperienceDateModels));
                 }
             }
 
             groupedList.add(appliedPersonel);
         }
 
-        Collections.sort(groupedList,Comparator.comparing(AppliedPersonelView::getApplicantId).reversed());
+        Collections.sort(groupedList,Comparator.comparing(AppliedPersonelView::getAppliedDate).reversed());
 
         return groupedList;
     }
@@ -439,5 +474,27 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
 
         return Math.floor(totalWorkExperience/356.0);
+    }
+
+    @Override
+    public void applyForInternalPositions(Long[] ids) {
+        IAuthenticationFacade authenticationFacade= new AuthenticationFacade();
+        UserPrinciple authentication= (UserPrinciple) authenticationFacade.getAuthentication().getPrincipal();
+        Optional<UserEntity> userEntity= userRepository.findByUsernameAndEnabled(authentication.getUsername(),true);
+        Employee employee=employeeRepository.findByEmail(userEntity.get().getUsername());
+        for (Long vacancyId:ids) {
+            InternalApplication internalApplication=new InternalApplication();
+            InternalVacancy internalVacancy=internalVacancyRepository.findOne(vacancyId);
+            internalApplication.setAppliedDate(new Date());
+            internalApplication.setEmployeeId(employee.getEmployeeId());
+            internalApplication.setInternalVacancy(internalVacancy);
+
+            internalApplicationRepository.save(internalApplication);
+        }
+    }
+
+    @Override
+    public List<InternalApplicationView> getInternalApplicationByVacancy(Long vacancyId) {
+        return internalApplicationViewRepository.findByVacancyId(vacancyId);
     }
 }

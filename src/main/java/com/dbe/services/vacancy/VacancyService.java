@@ -1,5 +1,6 @@
 package com.dbe.services.vacancy;
 
+import com.dbe.services.vacancy.model.InternalVacancyModel;
 import com.dbe.services.vacancy.model.VacancyModel;
 import com.dbe.services.vacancy.model.VacancyModelDetail;
 
@@ -17,6 +18,13 @@ public interface VacancyService {
     void addOrUpdateVacancyDetail(VacancyModelDetail vacancyModelDetail);
     List<VacancyModelDetail> getAllDetailsForVacancy(Long vacancyId);
     void deleteVacancyModelDetail(Long id);
+
+    //------Internal Vacancy---------
+    List<InternalVacancyModel> getAllInternalVacancies();
+    List<InternalVacancyModel> getALLInternalVacanciesByPlacement(String placement);
+    InternalVacancyModel getInternalVacancyGivenId(Long id);
+    void addOrUpdateInternalVacancy(InternalVacancyModel internalVacancyModel);
+    void deleteInternalVacancy(Long id);
 
 
 }
