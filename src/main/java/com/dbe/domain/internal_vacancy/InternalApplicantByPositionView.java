@@ -17,6 +17,9 @@ public class InternalApplicantByPositionView {
     private String positionTwo;
     @Column(name="POSITION_THREE")
     private String positionThree;
+    private Long vacancyId1;
+    private Long vacancyId2;
+    private Long vacancyId3;
 
     public Long getEmployeeId() {
         return employeeId;
@@ -56,5 +59,29 @@ public class InternalApplicantByPositionView {
 
     public void setPositionThree(String positionThree) {
         this.positionThree = positionThree;
+    }
+
+    public Long getVacancyId1() {
+        return vacancyId1;
+    }
+
+    public void setVacancyId1(Long vacancyId1) {
+        this.vacancyId1 = vacancyId1;
+    }
+
+    public Long getVacancyId2() {
+        return vacancyId2;
+    }
+
+    public void setVacancyId2(Long vacancyId2) {
+        this.vacancyId2 = vacancyId2;
+    }
+
+    public Long getVacancyId3() {
+        return vacancyId3;
+    }
+
+    public void setVacancyId3(Long vacancyId3) {
+        this.vacancyId3 = vacancyId3;
     }
 }

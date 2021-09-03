@@ -12,6 +12,7 @@ public class InternalPositionByApplicantView {
     private String employeeId;
     private String employeeName;
     private String position;
+    private Long vacancyId;
 
     public Long getId() {
         return id;
@@ -43,5 +44,13 @@ public class InternalPositionByApplicantView {
 
     public void setPosition(String position) {
         this.position = position;
+    }
+
+    public Long getVacancyId() {
+        return vacancyId;
+    }
+
+    public void setVacancyId(Long vacancyId) {
+        this.vacancyId = vacancyId;
     }
 }

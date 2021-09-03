@@ -140,17 +140,18 @@ public class ApplicationController {
     }
 
     @GetMapping("/internalApplicantsByPosition")
-    List<InternalApplicantByPositionView> getInternalApplicantsByPosition(){
+    public List<InternalApplicantByPositionView> getInternalApplicantsByPosition(){
         return applicationService.getApplicantsByPosition();
     }
 
     @GetMapping("/internalPositionByApplicant")
-    List<InternalPositionByApplicantView> getInternalPositionByApplicant(){
+    public List<InternalPositionByApplicantView> getInternalPositionByApplicant(){
+        List<InternalPositionByApplicantView> i=applicationService.getPositionByApplicant();
         return applicationService.getPositionByApplicant();
     }
 
     @GetMapping("/employeeInfo/{username:.+}")
-    Employee getEmployeeInfo(@PathVariable String username){
+    public Employee getEmployeeInfo(@PathVariable String username){
         Employee employee=applicationService.getEmployeeInfo(username);
         return employee;
     }
