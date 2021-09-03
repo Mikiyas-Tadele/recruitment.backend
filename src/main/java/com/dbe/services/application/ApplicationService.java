@@ -43,5 +43,7 @@ public interface ApplicationService {
 
     Employee getEmployeeInfo(String username);
 
+    String getFileNameGivenVacancyAndEmployeeId(Long vacancyId,Long employeeId);
+
 
 }

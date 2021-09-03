@@ -155,4 +155,9 @@ public class ApplicationController {
         Employee employee=applicationService.getEmployeeInfo(username);
         return employee;
     }
+
+    @GetMapping("/fileNameToDownload/{vacancyId}/{employeeId}")
+    public String getFileNameToDownload(@PathVariable("vacancyId")Long vacancyId,@PathVariable("employeeId")Long employeeId){
+        return applicationService.getFileNameGivenVacancyAndEmployeeId(vacancyId,employeeId);
+    }
 }

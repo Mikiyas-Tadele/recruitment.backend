@@ -529,4 +529,9 @@ public class ApplicationServiceImpl implements  ApplicationService {
         Employee employee = employeeRepository.findByEmail(username);
         return employee;
     }
+
+    @Override
+    public String getFileNameGivenVacancyAndEmployeeId(Long vacancyId, Long employeeId) {
+        return internalApplicationFileRepository.findbyEmployeeAndVacancy(employeeId,vacancyId).getFileName();
+    }
 }
