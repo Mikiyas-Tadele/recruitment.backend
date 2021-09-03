@@ -1,5 +1,6 @@
 package com.dbe.services.vacancy;
 
+import com.dbe.domain.internal_vacancy.Employee;
 import com.dbe.domain.internal_vacancy.InternalVacancy;
 import com.dbe.domain.vacancy.Vacancy;
 import com.dbe.domain.vacancy.VacancyDetail;
@@ -31,19 +32,19 @@ public class VacancyServiceImpl implements VacancyService {
 
     @Override
     public VacancyModel addOrUpdateVacancyDetail(VacancyModel vacancyModel) {
-        Vacancy vacancy=getVacancyFromModel(vacancyModel);
-      vacancyRepository.save(vacancy);
+        Vacancy vacancy = getVacancyFromModel(vacancyModel);
+        vacancyRepository.save(vacancy);
 
-      return getModelFromVacancyEntity(vacancy);
+        return getModelFromVacancyEntity(vacancy);
 
     }
 
     @Override
     public List<VacancyModel> getAllVacancies() {
 
-        List<VacancyModel> models=new ArrayList<>();
-        Iterable<Vacancy> vacancies=vacancyRepository.findAll();
-        for (Vacancy vacancy:vacancies) {
+        List<VacancyModel> models = new ArrayList<>();
+        Iterable<Vacancy> vacancies = vacancyRepository.findAll();
+        for (Vacancy vacancy : vacancies) {
             models.add(getModelFromVacancyEntity(vacancy));
         }
 
@@ -54,21 +55,21 @@ public class VacancyServiceImpl implements VacancyService {
 
     @Override
     public List<VacancyModel> getAllActiveVacancies() {
-        List<VacancyModel> models=new ArrayList<>();
-        Iterable<Vacancy> vacancies=vacancyRepository.findActiveVacancies(SystemConstants.ACTIVE_VACANCY);
-        for (Vacancy vacancy:vacancies) {
+        List<VacancyModel> models = new ArrayList<>();
+        Iterable<Vacancy> vacancies = vacancyRepository.findActiveVacancies(SystemConstants.ACTIVE_VACANCY);
+        for (Vacancy vacancy : vacancies) {
             models.add(getModelFromVacancyEntity(vacancy));
         }
 
 
-         Collections.sort(models, Comparator.comparing(VacancyModel::getPostedDate).reversed());
+        Collections.sort(models, Comparator.comparing(VacancyModel::getPostedDate).reversed());
 
         return models;
     }
 
     @Override
     public VacancyModel getVacancy(Long id) {
-        Vacancy vacancy=vacancyRepository.findOne(id);
+        Vacancy vacancy = vacancyRepository.findOne(id);
 
         return getModelFromVacancyEntity(vacancy);
     }
@@ -80,9 +81,9 @@ public class VacancyServiceImpl implements VacancyService {
     }
 
 
-    private Vacancy getVacancyFromModel(VacancyModel vacancyModel){
-        Vacancy  vacancy= vacancyModel!=null && vacancyModel.getId()!=null
-                ? vacancyRepository.findOne(vacancyModel.getId()):new Vacancy();
+    private Vacancy getVacancyFromModel(VacancyModel vacancyModel) {
+        Vacancy vacancy = vacancyModel != null && vacancyModel.getId() != null
+                ? vacancyRepository.findOne(vacancyModel.getId()) : new Vacancy();
         vacancy.setLocation(vacancyModel.getLocation());
         vacancy.setDeadlineDate(vacancyModel.getDeadlineDate());
         vacancy.setPostedDate(vacancyModel.getPostedDate());
@@ -99,8 +100,8 @@ public class VacancyServiceImpl implements VacancyService {
         return vacancy;
     }
 
-    private VacancyModel getModelFromVacancyEntity(Vacancy vacancy){
-        VacancyModel vacancyModel=new VacancyModel();
+    private VacancyModel getModelFromVacancyEntity(Vacancy vacancy) {
+        VacancyModel vacancyModel = new VacancyModel();
         vacancyModel.setId(vacancy.getId());
         vacancyModel.setWorkExperience(vacancy.getWorkExperience());
         vacancyModel.setTitle(vacancy.getTitle());
@@ -108,43 +109,41 @@ public class VacancyServiceImpl implements VacancyService {
         vacancyModel.setPostedDate(vacancy.getPostedDate());
         vacancyModel.setDeadlineDate(vacancy.getDeadlineDate());
         vacancyModel.setLocation(vacancy.getLocation());
-        vacancyModel.setClosed(vacancy.getStatus()==2l ? true :false);
+        vacancyModel.setClosed(vacancy.getStatus() == 2l ? true : false);
         vacancyModel.setEmploymentCondition(vacancy.getEmploymentCondition());
         vacancyModel.setRequiredNumber(vacancy.getRequiredNumber());
         vacancyModel.setSalary(vacancy.getSalary());
         vacancyModel.setSalaryDescription(vacancy.getSalaryDescription());
-        Duration duration=Duration.between(LocalDateTime.now(),convertToLocalDateTimeViaInstant(vacancy.getDeadlineDate()).plusDays(1));
+        Duration duration = Duration.between(LocalDateTime.now(), convertToLocalDateTimeViaInstant(vacancy.getDeadlineDate()).plusDays(1));
         long days = duration.toDays();
-        String daysLeft="";
-        if(days==1){
-            daysLeft= days + " Day left before Deadline";
-        }
-        else if(days>0){
-            daysLeft= days + " Days left before Deadline";
-        }
-        else if(days==0){
-            daysLeft=" Today is Deadline Date";
-        }else {
-            daysLeft =Math.abs(days) + " days has passed since closing";
+        String daysLeft = "";
+        if (days == 1) {
+            daysLeft = days + " Day left before Deadline";
+        } else if (days > 0) {
+            daysLeft = days + " Days left before Deadline";
+        } else if (days == 0) {
+            daysLeft = " Today is Deadline Date";
+        } else {
+            daysLeft = Math.abs(days) + " days has passed since closing";
         }
         vacancyModel.setMinutesElapsedSinceCreation(daysLeft);
-        List<VacancyModelDetail> vacancyModelDetails=new ArrayList<>();
-            for (VacancyDetail vacancyDetail : vacancy.getVacancyDetails()) {
-                VacancyModelDetail vacancyModelDetail = new VacancyModelDetail();
-                vacancyModelDetail.setVacancyId(vacancyDetail.getVacancy().getId());
-                vacancyModelDetail.setTitle(vacancyDetail.getTitle());
-                vacancyModelDetail.setDescription(vacancyDetail.getDescription());
-                vacancyModelDetails.add(vacancyModelDetail);
-            }
-            vacancyModel.getVacancyModelDetailList().addAll(vacancyModelDetails);
+        List<VacancyModelDetail> vacancyModelDetails = new ArrayList<>();
+        for (VacancyDetail vacancyDetail : vacancy.getVacancyDetails()) {
+            VacancyModelDetail vacancyModelDetail = new VacancyModelDetail();
+            vacancyModelDetail.setVacancyId(vacancyDetail.getVacancy().getId());
+            vacancyModelDetail.setTitle(vacancyDetail.getTitle());
+            vacancyModelDetail.setDescription(vacancyDetail.getDescription());
+            vacancyModelDetails.add(vacancyModelDetail);
+        }
+        vacancyModel.getVacancyModelDetailList().addAll(vacancyModelDetails);
 
         return vacancyModel;
     }
 
     @Override
     public void addOrUpdateVacancyDetail(VacancyModelDetail vacancyModelDetail) {
-        VacancyDetail vacancyDetail=vacancyModelDetail!=null && vacancyModelDetail.getId()!=null?
-                 vacancyDetailRepository.findOne(vacancyModelDetail.getId()):new VacancyDetail();
+        VacancyDetail vacancyDetail = vacancyModelDetail != null && vacancyModelDetail.getId() != null ?
+                vacancyDetailRepository.findOne(vacancyModelDetail.getId()) : new VacancyDetail();
         vacancyDetail.setDescription(vacancyModelDetail.getDescription());
         vacancyDetail.setTitle(vacancyModelDetail.getTitle());
         vacancyDetail.setVacancy(vacancyRepository.findOne(vacancyModelDetail.getVacancyId()));
@@ -155,10 +154,10 @@ public class VacancyServiceImpl implements VacancyService {
 
     @Override
     public List<VacancyModelDetail> getAllDetailsForVacancy(Long vacancyId) {
-        List<VacancyModelDetail> vacancyModelDetails=new ArrayList<>();
-        List<VacancyDetail> vacancyDetails=vacancyDetailRepository.findByVacancyId(vacancyId);
-        for (VacancyDetail vacancyDetail:vacancyDetails) {
-            VacancyModelDetail vacancyModelDetail=new VacancyModelDetail();
+        List<VacancyModelDetail> vacancyModelDetails = new ArrayList<>();
+        List<VacancyDetail> vacancyDetails = vacancyDetailRepository.findByVacancyId(vacancyId);
+        for (VacancyDetail vacancyDetail : vacancyDetails) {
+            VacancyModelDetail vacancyModelDetail = new VacancyModelDetail();
             vacancyModelDetail.setDescription(vacancyDetail.getDescription());
             vacancyModelDetail.setTitle(vacancyDetail.getTitle());
             vacancyModelDetail.setVacancyId(vacancyDetail.getVacancy().getId());
@@ -173,7 +172,7 @@ public class VacancyServiceImpl implements VacancyService {
 
     @Override
     public void deleteVacancyModelDetail(Long id) {
-       vacancyDetailRepository.delete(id);
+        vacancyDetailRepository.delete(id);
     }
 
     private LocalDateTime convertToLocalDateTimeViaInstant(Date dateToConvert) {
@@ -184,26 +183,26 @@ public class VacancyServiceImpl implements VacancyService {
 
     @Override
     public void makeDeadLinePassedVacanciesInActive() {
-      List<Vacancy> vacancies=vacancyRepository.findActiveVacancies(SystemConstants.ACTIVE_VACANCY);
-      boolean change=false;
-        for (Vacancy vacancy:vacancies) {
-            LocalDateTime deadLineDate=convertToLocalDateTimeViaInstant(vacancy.getDeadlineDate());
-            LocalDateTime today=LocalDateTime.now();
-            if(today.isAfter(deadLineDate.plusDays(1))){
-                change=true;
+        List<Vacancy> vacancies = vacancyRepository.findActiveVacancies(SystemConstants.ACTIVE_VACANCY);
+        boolean change = false;
+        for (Vacancy vacancy : vacancies) {
+            LocalDateTime deadLineDate = convertToLocalDateTimeViaInstant(vacancy.getDeadlineDate());
+            LocalDateTime today = LocalDateTime.now();
+            if (today.isAfter(deadLineDate.plusDays(1))) {
+                change = true;
                 vacancy.setStatus(SystemConstants.INACTIVE_VACANCY);
             }
         }
 
-        if(change){
+        if (change) {
             vacancyRepository.save(vacancies);
         }
     }
 
     @Override
     public List<InternalVacancyModel> getAllInternalVacancies() {
-        List<InternalVacancyModel> vacancyModels=new ArrayList<>();
-        Iterable<InternalVacancy> internalVacancies=internalVacancyRepository.findAll();
+        List<InternalVacancyModel> vacancyModels = new ArrayList<>();
+        Iterable<InternalVacancy> internalVacancies = internalVacancyRepository.findAll();
         getInternalVacancyModel(vacancyModels, internalVacancies);
 
         return vacancyModels;
@@ -211,16 +210,16 @@ public class VacancyServiceImpl implements VacancyService {
 
     @Override
     public List<InternalVacancyModel> getALLInternalVacanciesByPlacement(String placement) {
-        List<InternalVacancyModel> vacancyModels=new ArrayList<>();
-        Iterable<InternalVacancy> internalVacancies=internalVacancyRepository.findByPlacementOfWork(placement);
+        List<InternalVacancyModel> vacancyModels = new ArrayList<>();
+        Iterable<InternalVacancy> internalVacancies = internalVacancyRepository.findByPlacementOfWork(placement);
         getInternalVacancyModel(vacancyModels, internalVacancies);
 
         return vacancyModels;
     }
 
     private void getInternalVacancyModel(List<InternalVacancyModel> vacancyModels, Iterable<InternalVacancy> internalVacancies) {
-        for (InternalVacancy internalVacancy:internalVacancies) {
-            InternalVacancyModel vacancyModel=new InternalVacancyModel();
+        for (InternalVacancy internalVacancy : internalVacancies) {
+            InternalVacancyModel vacancyModel = new InternalVacancyModel();
             vacancyModel.setId(internalVacancy.getId());
             vacancyModel.setJobGrade(internalVacancy.getJobGrade());
             vacancyModel.setNoRequired(internalVacancy.getNoRequired());
@@ -237,9 +236,9 @@ public class VacancyServiceImpl implements VacancyService {
     @Override
     public InternalVacancyModel getInternalVacancyGivenId(Long id) {
 
-        InternalVacancy internalVacancy=internalVacancyRepository.findOne(id);
+        InternalVacancy internalVacancy = internalVacancyRepository.findOne(id);
 
-        InternalVacancyModel vacancyModel=new InternalVacancyModel();
+        InternalVacancyModel vacancyModel = new InternalVacancyModel();
         vacancyModel.setId(internalVacancy.getId());
         vacancyModel.setJobGrade(internalVacancy.getJobGrade());
         vacancyModel.setNoRequired(internalVacancy.getNoRequired());
@@ -254,9 +253,9 @@ public class VacancyServiceImpl implements VacancyService {
 
     @Override
     public void addOrUpdateInternalVacancy(InternalVacancyModel internalVacancyModel) {
-     InternalVacancy internalVacancy=internalVacancyModel.getId()!=null?
-             internalVacancyRepository.findOne(internalVacancyModel.getId()):
-             new InternalVacancy();
+        InternalVacancy internalVacancy = internalVacancyModel.getId() != null ?
+                internalVacancyRepository.findOne(internalVacancyModel.getId()) :
+                new InternalVacancy();
         internalVacancy.setJobGrade(internalVacancyModel.getJobGrade());
         internalVacancy.setNoRequired(internalVacancyModel.getNoRequired());
         internalVacancy.setEndDate(internalVacancyModel.getEndDate());

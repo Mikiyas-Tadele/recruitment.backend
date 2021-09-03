@@ -2,6 +2,7 @@ package com.dbe.services.application;
 
 import com.dbe.domain.applicant.AppliedJobView;
 import com.dbe.domain.applicant.AppliedPersonelView;
+import com.dbe.domain.internal_vacancy.Employee;
 import com.dbe.domain.internal_vacancy.InternalApplicantByPositionView;
 import com.dbe.domain.internal_vacancy.InternalApplicationView;
 import com.dbe.domain.internal_vacancy.InternalPositionByApplicantView;
@@ -39,6 +40,8 @@ public interface ApplicationService {
 
     List<InternalApplicantByPositionView> getApplicantsByPosition();
     List<InternalPositionByApplicantView> getPositionByApplicant();
+
+    Employee getEmployeeInfo(String username);
 
 
 }

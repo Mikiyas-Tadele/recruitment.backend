@@ -228,6 +228,11 @@ public class ApplicationServiceImpl implements  ApplicationService {
             applicantFile.setEmployeeId(employee.getEmployeeId());
             applicantFile.setVacancyId(vacancyId);
             internalApplicationFileRepository.save(applicantFile);
+            if(internalApplicationFileRepository.findbyEmployee(employee.getEmployeeId()).size()==3){
+                UserEntity userToDisable=userEntity.get();
+                userToDisable.setEnabled(false);
+                userRepository.save(userToDisable);
+            }
     }
 
     private void getWorkExperiences(ApplicantModel applicantModel, Applicant applicant) {
@@ -517,5 +522,11 @@ public class ApplicationServiceImpl implements  ApplicationService {
     @Override
     public List<InternalPositionByApplicantView> getPositionByApplicant() {
         return internalPositionByApplicantViewRepository.findAll();
+    }
+
+    @Override
+    public Employee getEmployeeInfo(String username) {
+        Employee employee = employeeRepository.findByEmail(username);
+        return employee;
     }
 }

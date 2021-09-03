@@ -2,6 +2,7 @@ package com.dbe.web;
 
 import com.dbe.domain.applicant.AppliedJobView;
 import com.dbe.domain.applicant.AppliedPersonelView;
+import com.dbe.domain.internal_vacancy.Employee;
 import com.dbe.domain.internal_vacancy.InternalApplicantByPositionView;
 import com.dbe.domain.internal_vacancy.InternalApplicationView;
 import com.dbe.domain.internal_vacancy.InternalPositionByApplicantView;
@@ -146,5 +147,11 @@ public class ApplicationController {
     @GetMapping("/internalPositionByApplicant")
     List<InternalPositionByApplicantView> getInternalPositionByApplicant(){
         return applicationService.getPositionByApplicant();
+    }
+
+    @GetMapping("/employeeInfo/{username:.+}")
+    Employee getEmployeeInfo(@PathVariable String username){
+        Employee employee=applicationService.getEmployeeInfo(username);
+        return employee;
     }
 }

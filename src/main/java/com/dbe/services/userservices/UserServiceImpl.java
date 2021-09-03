@@ -300,8 +300,7 @@ public class UserServiceImpl implements UserService {
               verificationTokenRepository.delete(verificationToken.getId());
               throw new ApplicationException("Yours Verification Link is expired");
           }
-        }
-        else{
+         }else{
             throw new ApplicationException("Yours Verification Link does not exist");
         }
     }
@@ -341,7 +340,7 @@ public class UserServiceImpl implements UserService {
         helper.setSubject(subject);
 
         content = content.replace("[[name]]", userEntity.getFullName());
-        String verifyURL = SystemConstants.VERIFICATION_URL + verificationToken.getToken();
+        String verifyURL = SystemConstants.PROD_VERIFICATION_URL + verificationToken.getToken();
 
         content = content.replace("[[URL]]", verifyURL);
 
