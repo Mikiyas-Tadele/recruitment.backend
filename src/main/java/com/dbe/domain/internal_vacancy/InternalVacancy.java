@@ -22,6 +22,7 @@ public class InternalVacancy {
     private Date postDate;
     @Column(name="end_date")
     private Date endDate;
+    private Long parent;
 
     public Long getId() {
         return id;
@@ -85,5 +86,13 @@ public class InternalVacancy {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public Long getParent() {
+        return parent;
+    }
+
+    public void setParent(Long parent) {
+        this.parent = parent;
     }
 }

@@ -11,6 +11,7 @@ public class InternalVacancyModel {
     private String placementOfWork;
     private Date postDate;
     private Date endDate;
+    private Long parent;
 
     public Long getId() {
         return id;
@@ -74,5 +75,13 @@ public class InternalVacancyModel {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public Long getParent() {
+        return parent;
+    }
+
+    public void setParent(Long parent) {
+        this.parent = parent;
     }
 }

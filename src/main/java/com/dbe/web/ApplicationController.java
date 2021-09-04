@@ -12,6 +12,7 @@ import com.dbe.services.application.model.ApplicationModel;
 import com.dbe.services.application.model.SearchModel;
 import com.dbe.utilities.exception.StorageException;
 import com.dbe.utilities.file_services.FileStorageService;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -158,6 +159,6 @@ public class ApplicationController {
 
     @GetMapping("/fileNameToDownload/{vacancyId}/{employeeId}")
     public String getFileNameToDownload(@PathVariable("vacancyId")Long vacancyId,@PathVariable("employeeId")Long employeeId){
-        return applicationService.getFileNameGivenVacancyAndEmployeeId(vacancyId,employeeId);
+        return JSONObject.quote(applicationService.getFileNameGivenVacancyAndEmployeeId(vacancyId,employeeId));
     }
 }

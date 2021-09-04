@@ -1,9 +1,11 @@
 package com.dbe.services.vacancy;
 
 import com.dbe.domain.internal_vacancy.Employee;
+import com.dbe.domain.internal_vacancy.InternalManagerialPositionsView;
 import com.dbe.domain.internal_vacancy.InternalVacancy;
 import com.dbe.domain.vacancy.Vacancy;
 import com.dbe.domain.vacancy.VacancyDetail;
+import com.dbe.repositories.internal_vacancy.InternalManagerialPositionsRepository;
 import com.dbe.repositories.internal_vacancy.InternalVacancyRepository;
 import com.dbe.repositories.vacancyRepository.VacancyDetailRepository;
 import com.dbe.repositories.vacancyRepository.VacancyRepository;
@@ -29,6 +31,8 @@ public class VacancyServiceImpl implements VacancyService {
     private VacancyDetailRepository vacancyDetailRepository;
     @Autowired
     private InternalVacancyRepository internalVacancyRepository;
+    @Autowired
+    private InternalManagerialPositionsRepository internalMangerialPositionsViewRepository;
 
     @Override
     public VacancyModel addOrUpdateVacancyDetail(VacancyModel vacancyModel) {
@@ -228,6 +232,7 @@ public class VacancyServiceImpl implements VacancyService {
             vacancyModel.setPosition(internalVacancy.getPosition());
             vacancyModel.setPlacementOfWork(internalVacancy.getPlacementOfWork());
             vacancyModel.setQualifications(internalVacancy.getQualifications());
+            vacancyModel.setParent(internalVacancy.getParent());
 
             vacancyModels.add(vacancyModel);
         }
@@ -270,5 +275,10 @@ public class VacancyServiceImpl implements VacancyService {
     @Override
     public void deleteInternalVacancy(Long id) {
 
+    }
+
+    @Override
+    public List<InternalManagerialPositionsView> getAllPositions() {
+        return internalMangerialPositionsViewRepository.findAll();
     }
 }
