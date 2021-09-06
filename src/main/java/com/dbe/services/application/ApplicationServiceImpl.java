@@ -516,12 +516,50 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
     @Override
     public List<InternalApplicantByPositionView> getApplicantsByPosition() {
-        return internalApplicantByPositionViewRepository.findAll();
+         List<InternalApplicantByPositionView> applicants=internalApplicantByPositionViewRepository.findAll();
+        for (InternalApplicantByPositionView applicant:applicants) {
+           if(applicant.getManagerial()==0){
+                applicant.setPositionOne(null);
+                applicant.setVacancyId1(null);
+            }if(applicant.getManageria2()==0){
+               applicant.setPositionTwo(null);
+               applicant.setVacancyId2(null);
+           }if(applicant.getManageria3()==0){
+               applicant.setPositionThree(null);
+               applicant.setVacancyId3(null);
+           }
+
+        }
+        return applicants;
     }
 
     @Override
     public List<InternalPositionByApplicantView> getPositionByApplicant() {
-        return internalPositionByApplicantViewRepository.findAll();
+        return internalPositionByApplicantViewRepository.findByManagerialPositions(1l);
+    }
+
+    @Override
+    public List<InternalApplicantByPositionView> getApplicantByNonManagerialPosition() {
+        List<InternalApplicantByPositionView> applicants=internalApplicantByPositionViewRepository.findAll();
+        for (InternalApplicantByPositionView applicant:applicants) {
+            if(applicant.getManagerial()==1){
+                applicant.setPositionOne(null);
+                applicant.setVacancyId1(null);
+            }if(applicant.getManageria2()==1){
+                applicant.setPositionTwo(null);
+                applicant.setVacancyId2(null);
+            }if(applicant.getManageria3()==1){
+                applicant.setPositionThree(null);
+                applicant.setVacancyId3(null);
+            }
+
+        }
+        return applicants;
+    }
+
+    @Override
+    public List<InternalPositionByApplicantView> getNonManagerialPositionByApplicant() {
+        return internalPositionByApplicantViewRepository.findByManagerialPositions(0l);
     }
 
     @Override

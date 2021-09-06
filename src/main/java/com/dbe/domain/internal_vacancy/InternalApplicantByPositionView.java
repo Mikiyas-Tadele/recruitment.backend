@@ -20,6 +20,9 @@ public class InternalApplicantByPositionView {
     private Long vacancyId1;
     private Long vacancyId2;
     private Long vacancyId3;
+    private Long managerial;
+    private Long manageria2;
+    private Long manageria3;
 
     public Long getEmployeeId() {
         return employeeId;
@@ -83,5 +86,29 @@ public class InternalApplicantByPositionView {
 
     public void setVacancyId3(Long vacancyId3) {
         this.vacancyId3 = vacancyId3;
+    }
+
+    public Long getManagerial() {
+        return managerial;
+    }
+
+    public void setManagerial(Long managerial) {
+        this.managerial = managerial;
+    }
+
+    public Long getManageria2() {
+        return manageria2;
+    }
+
+    public void setManageria2(Long manageria2) {
+        this.manageria2 = manageria2;
+    }
+
+    public Long getManageria3() {
+        return manageria3;
+    }
+
+    public void setManageria3(Long manageria3) {
+        this.manageria3 = manageria3;
     }
 }

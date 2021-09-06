@@ -12,6 +12,7 @@ public class InternalVacancyModel {
     private Date postDate;
     private Date endDate;
     private Long parent;
+    private Long managerial;
 
     public Long getId() {
         return id;
@@ -83,5 +84,13 @@ public class InternalVacancyModel {
 
     public void setParent(Long parent) {
         this.parent = parent;
+    }
+
+    public Long getManagerial() {
+        return managerial;
+    }
+
+    public void setManagerial(Long managerial) {
+        this.managerial = managerial;
     }
 }

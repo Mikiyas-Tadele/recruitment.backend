@@ -23,6 +23,8 @@ public class InternalVacancy {
     @Column(name="end_date")
     private Date endDate;
     private Long parent;
+    private Long status;
+    private Long managerial;
 
     public Long getId() {
         return id;
@@ -94,5 +96,21 @@ public class InternalVacancy {
 
     public void setParent(Long parent) {
         this.parent = parent;
+    }
+
+    public Long getStatus() {
+        return status;
+    }
+
+    public void setStatus(Long status) {
+        this.status = status;
+    }
+
+    public Long getManagerial() {
+        return managerial;
+    }
+
+    public void setManagerial(Long managerial) {
+        this.managerial = managerial;
     }
 }

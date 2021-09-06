@@ -41,6 +41,9 @@ public interface ApplicationService {
     List<InternalApplicantByPositionView> getApplicantsByPosition();
     List<InternalPositionByApplicantView> getPositionByApplicant();
 
+    List<InternalApplicantByPositionView> getApplicantByNonManagerialPosition();
+    List<InternalPositionByApplicantView> getNonManagerialPositionByApplicant();
+
     Employee getEmployeeInfo(String username);
 
     String getFileNameGivenVacancyAndEmployeeId(Long vacancyId,Long employeeId);

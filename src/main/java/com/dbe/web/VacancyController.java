@@ -1,7 +1,5 @@
 package com.dbe.web;
 
-import com.dbe.domain.internal_vacancy.InternalManagerialPositionsView;
-import com.dbe.domain.vacancy.Vacancy;
 import com.dbe.services.vacancy.VacancyService;
 import com.dbe.services.vacancy.model.InternalVacancyModel;
 import com.dbe.services.vacancy.model.VacancyModel;
@@ -72,10 +70,5 @@ public class VacancyController {
     @GetMapping("/internal-vacancy/{id}")
     public InternalVacancyModel getInternalVacancy(@PathVariable Long id){
         return vacancyService.getInternalVacancyGivenId(id);
-    }
-
-    @GetMapping("/all-positions")
-    public List<InternalManagerialPositionsView> getAllPositions(){
-        return vacancyService.getAllPositions();
     }
 }

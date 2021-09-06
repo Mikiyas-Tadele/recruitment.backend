@@ -151,6 +151,16 @@ public class ApplicationController {
         return applicationService.getPositionByApplicant();
     }
 
+    @GetMapping("/internalApplicantsByNonManagerPosition")
+    public List<InternalApplicantByPositionView> getInternalApplicantsByNonManagerPosition(){
+        return applicationService.getApplicantByNonManagerialPosition();
+    }
+
+    @GetMapping("/internalNonManagerPositionByApplicant")
+    public List<InternalPositionByApplicantView> getInternalNonManagerPositionByApplicant(){
+        return applicationService.getNonManagerialPositionByApplicant();
+    }
+
     @GetMapping("/employeeInfo/{username:.+}")
     public Employee getEmployeeInfo(@PathVariable String username){
         Employee employee=applicationService.getEmployeeInfo(username);
