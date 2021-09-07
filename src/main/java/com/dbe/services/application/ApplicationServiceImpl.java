@@ -516,15 +516,15 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
     @Override
     public List<InternalApplicantByPositionView> getApplicantsByPosition() {
-         List<InternalApplicantByPositionView> applicants=internalApplicantByPositionViewRepository.findAll();
+         List<InternalApplicantByPositionView> applicants=internalApplicantByPositionViewRepository.findByManagerialPositions(1L);
         for (InternalApplicantByPositionView applicant:applicants) {
-           if(applicant.getManagerial()==0){
+           if(applicant.getManageria3()!=null && applicant.getManagerial()==0){
                 applicant.setPositionOne(null);
                 applicant.setVacancyId1(null);
-            }if(applicant.getManageria2()==0){
+            }if(applicant.getManageria3()!=null && applicant.getManageria2()==0){
                applicant.setPositionTwo(null);
                applicant.setVacancyId2(null);
-           }if(applicant.getManageria3()==0){
+           }if(applicant.getManageria3()!=null && applicant.getManageria3()==0){
                applicant.setPositionThree(null);
                applicant.setVacancyId3(null);
            }
@@ -535,20 +535,21 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
     @Override
     public List<InternalPositionByApplicantView> getPositionByApplicant() {
-        return internalPositionByApplicantViewRepository.findByManagerialPositions(1l);
+        List<InternalPositionByApplicantView> internalPositionByApplicantViews= internalPositionByApplicantViewRepository.findByManagerialPositions(1l);
+        return internalPositionByApplicantViews;
     }
 
     @Override
     public List<InternalApplicantByPositionView> getApplicantByNonManagerialPosition() {
-        List<InternalApplicantByPositionView> applicants=internalApplicantByPositionViewRepository.findAll();
+        List<InternalApplicantByPositionView> applicants=internalApplicantByPositionViewRepository.findByManagerialPositions(0l);
         for (InternalApplicantByPositionView applicant:applicants) {
-            if(applicant.getManagerial()==1){
+            if(applicant.getManageria3()!=null && applicant.getManagerial()==1){
                 applicant.setPositionOne(null);
                 applicant.setVacancyId1(null);
-            }if(applicant.getManageria2()==1){
+            }if(applicant.getManageria3()!=null && applicant.getManageria2()==1){
                 applicant.setPositionTwo(null);
                 applicant.setVacancyId2(null);
-            }if(applicant.getManageria3()==1){
+            }if(applicant.getManageria3()!=null && applicant.getManageria3()==1){
                 applicant.setPositionThree(null);
                 applicant.setVacancyId3(null);
             }
