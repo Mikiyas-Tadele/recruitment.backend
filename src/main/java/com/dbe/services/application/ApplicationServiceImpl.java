@@ -3,6 +3,7 @@ package com.dbe.services.application;
 import com.dbe.domain.applicant.*;
 import com.dbe.domain.internal_vacancy.*;
 import com.dbe.domain.security.UserEntity;
+import com.dbe.domain.security.VerificationToken;
 import com.dbe.repositories.applicant.*;
 import com.dbe.repositories.internal_vacancy.*;
 import com.dbe.repositories.security.UserRepository;
@@ -18,15 +19,21 @@ import com.dbe.utilities.file_services.FileStorageService;
 import com.dbe.utilities.models.SystemConstants;
 import com.dbe.utilities.specifications.AppliedPersonelSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.springframework.data.jpa.domain.Specifications.where;
 
@@ -81,6 +88,9 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
     @Autowired
     private InternalPositionByApplicantViewRepository internalPositionByApplicantViewRepository;
+
+    @Autowired
+    JavaMailSender javaMailSender;
 
 
 
@@ -232,6 +242,13 @@ public class ApplicationServiceImpl implements  ApplicationService {
                 UserEntity userToDisable=userEntity.get();
                 userToDisable.setEnabled(false);
                 userRepository.save(userToDisable);
+                try {
+                    sendConfirmationEmail(employee);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                } catch (MessagingException e) {
+                    e.printStackTrace();
+                }
             }
     }
 
@@ -516,7 +533,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
     @Override
     public List<InternalApplicantByPositionView> getApplicantsByPosition() {
-         List<InternalApplicantByPositionView> applicants=internalApplicantByPositionViewRepository.findByManagerialPositions(1L);
+         List<InternalApplicantByPositionView> applicants=internalApplicantByPositionViewRepository.findAll();
         for (InternalApplicantByPositionView applicant:applicants) {
            if(applicant.getManageria3()!=null && applicant.getManagerial()==0){
                 applicant.setPositionOne(null);
@@ -530,7 +547,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
            }
 
         }
-        return applicants;
+        return applicants.stream().filter(s->s.getPositionThree()!=null || s.getPositionTwo()!=null || s.getPositionOne()!=null).collect(Collectors.toList());
     }
 
     @Override
@@ -541,7 +558,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
     @Override
     public List<InternalApplicantByPositionView> getApplicantByNonManagerialPosition() {
-        List<InternalApplicantByPositionView> applicants=internalApplicantByPositionViewRepository.findByManagerialPositions(0l);
+        List<InternalApplicantByPositionView> applicants=internalApplicantByPositionViewRepository.findAll();
         for (InternalApplicantByPositionView applicant:applicants) {
             if(applicant.getManageria3()!=null && applicant.getManagerial()==1){
                 applicant.setPositionOne(null);
@@ -555,7 +572,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
             }
 
         }
-        return applicants;
+        return applicants.stream().filter(s->s.getPositionThree()!=null || s.getPositionTwo()!=null || s.getPositionOne()!=null).collect(Collectors.toList());
     }
 
     @Override
@@ -572,5 +589,34 @@ public class ApplicationServiceImpl implements  ApplicationService {
     @Override
     public String getFileNameGivenVacancyAndEmployeeId(Long vacancyId, Long employeeId) {
         return internalApplicationFileRepository.findbyEmployeeAndVacancy(employeeId,vacancyId).getFileName();
+    }
+
+    private void sendConfirmationEmail(Employee employee) throws UnsupportedEncodingException, MessagingException {
+        List<InternalApplicationView> appliedFor=internalApplicationViewRepository.findByEmployeeId(employee.getEmployeeId());
+        String toAddress = employee.getEmail();
+        String fromAddress = "hrm@dbe.com.et";
+        String senderName = "DBE Recruitment Team";
+        String subject = "Application Confirmation";
+        String content = "Dear [[name]],<br>"
+         +"You have successfully applied for the positions below<br>";
+        int i=1;
+        for (InternalApplicationView applicationView:appliedFor) {
+            content+="<h5>"+i+"."+applicationView.getAppliedPosition()+"</h5>";
+            i=i+1;
+        }
+                content+= "Thank you,<br>"
+                + "Human Resource Management Directorate, <br>"
+                + "Development Bank of Ethiopia";
+
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+        helper.setFrom(fromAddress, senderName);
+        helper.setTo(toAddress);
+        helper.setSubject(subject);
+        content = content.replace("[[name]]", employee.getName());
+
+        helper.setText(content, true);
+
+        javaMailSender.send(message);
     }
 }

@@ -19,6 +19,8 @@ public class InternalApplicationView {
     @Column(name="APPLIED_DATE")
     private Date appliedDate;
     private Long vacancyId;
+    private Long employeeId;
+    private String  appliedPosition;
 
     public Long getId() {
         return id;
@@ -74,5 +76,21 @@ public class InternalApplicationView {
 
     public void setVacancyId(Long vacancyId) {
         this.vacancyId = vacancyId;
+    }
+
+    public Long getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(Long employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    public String getAppliedPosition() {
+        return appliedPosition;
+    }
+
+    public void setAppliedPosition(String appliedPosition) {
+        this.appliedPosition = appliedPosition;
     }
 }

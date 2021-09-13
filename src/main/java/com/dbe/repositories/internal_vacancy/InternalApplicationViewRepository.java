@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface InternalApplicationViewRepository extends ReadOnlyRepository<InternalApplicationView,Long> {
     List<InternalApplicationView> findByVacancyId(Long vacancyId);
+    List<InternalApplicationView> findByEmployeeId(Long employeeId);
 }

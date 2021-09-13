@@ -96,11 +96,11 @@ public class UserServiceImpl implements UserService {
             if (userModel.getPassword() != null) {
                 existingUserEntity.setPassword(passwordEncoder.encode(userModel.getPassword()));
             }
-            Set<Role> roles = new HashSet<>();
-            if (userModel.getRoles() != null) {
-                getRolesToSave(userModel, roles);
-            }
-            existingUserEntity.setRoles(roles);
+//            Set<Role> roles = new HashSet<>();
+//            if (userModel.getRoles() != null) {
+//                getRolesToSave(userModel, roles);
+//            }
+//            existingUserEntity.setRoles(roles);
             userRepository.save(existingUserEntity);
             userModel.setId(existingUserEntity.getId());
         }
