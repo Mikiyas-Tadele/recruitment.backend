@@ -36,6 +36,8 @@ public interface ApplicationService {
 
     void applyForInternalPositions(Long[] ids);
 
+    void closeInternalApplication();
+
     List<InternalApplicationView> getInternalApplicationByVacancy(Long vacancyId);
 
     List<InternalApplicantByPositionView> getApplicantsByPosition();

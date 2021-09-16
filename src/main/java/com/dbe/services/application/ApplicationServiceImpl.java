@@ -238,18 +238,28 @@ public class ApplicationServiceImpl implements  ApplicationService {
             applicantFile.setEmployeeId(employee.getEmployeeId());
             applicantFile.setVacancyId(vacancyId);
             internalApplicationFileRepository.save(applicantFile);
-            if(internalApplicationFileRepository.findbyEmployee(employee.getEmployeeId()).size()==3){
-                UserEntity userToDisable=userEntity.get();
-                userToDisable.setEnabled(false);
-                userRepository.save(userToDisable);
-                try {
-                    sendConfirmationEmail(employee);
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                } catch (MessagingException e) {
-                    e.printStackTrace();
-                }
+
+    }
+
+    @Override
+    public void closeInternalApplication() {
+        IAuthenticationFacade authenticationFacade= new AuthenticationFacade();
+        UserPrinciple authentication= (UserPrinciple) authenticationFacade.getAuthentication().getPrincipal();
+        Optional<UserEntity> userEntity= userRepository.findByUsernameAndEnabled(authentication.getUsername(),true);
+        Employee  employee=employeeRepository.findByEmail(userEntity.get().getUsername());
+        if(internalApplicationViewRepository.findByEmployeeId(employee.getEmployeeId()).size()==3){
+            UserEntity userToDisable=userEntity.get();
+            userToDisable.setEnabled(false);
+            userRepository.save(userToDisable);
+            try {
+                sendConfirmationEmail(employee);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (MessagingException e) {
+                e.printStackTrace();
             }
+        }
+
     }
 
     private void getWorkExperiences(ApplicantModel applicantModel, Applicant applicant) {

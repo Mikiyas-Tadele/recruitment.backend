@@ -58,6 +58,11 @@ public class ApplicationController {
         applicationService.storeInternalApplicationFile(file,vacancyId);
     }
 
+    @RequestMapping("/interanal-application-closing")
+    public void closeInternalApplication(){
+        applicationService.closeInternalApplication();
+    }
+
     @RequestMapping("/download-Internal-applicant-File")
     public ResponseEntity<Resource> downloadInternalApplicantFile(@RequestParam Long employeeId,@RequestParam Long vacancyId,
                                              HttpServletRequest request) {

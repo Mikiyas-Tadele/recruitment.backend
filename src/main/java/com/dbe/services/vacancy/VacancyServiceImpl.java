@@ -228,6 +228,10 @@ public class VacancyServiceImpl implements VacancyService {
             vacancyModel.setQualifications(internalVacancy.getQualifications());
             vacancyModel.setParent(internalVacancy.getParent());
             vacancyModel.setManagerial(internalVacancy.getManagerial());
+            vacancyModel.setFieldOfStudy(internalVacancy.getFieldOfStudy());
+            vacancyModel.setEducationLevel(internalVacancy.getEducationLevel());
+            vacancyModel.setLocation(internalVacancy.getLocation());
+            vacancyModel.setCluster(internalVacancy.getCluster());
 
             vacancyModels.add(vacancyModel);
         }

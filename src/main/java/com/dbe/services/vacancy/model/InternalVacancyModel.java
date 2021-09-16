@@ -13,6 +13,10 @@ public class InternalVacancyModel {
     private Date endDate;
     private Long parent;
     private Long managerial;
+    private String fieldOfStudy;
+    private String educationLevel;
+    private String location;
+    private String cluster;
 
     public Long getId() {
         return id;
@@ -92,5 +96,37 @@ public class InternalVacancyModel {
 
     public void setManagerial(Long managerial) {
         this.managerial = managerial;
+    }
+
+    public String getFieldOfStudy() {
+        return fieldOfStudy;
+    }
+
+    public void setFieldOfStudy(String fieldOfStudy) {
+        this.fieldOfStudy = fieldOfStudy;
+    }
+
+    public String getEducationLevel() {
+        return educationLevel;
+    }
+
+    public void setEducationLevel(String educationLevel) {
+        this.educationLevel = educationLevel;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getCluster() {
+        return cluster;
+    }
+
+    public void setCluster(String cluster) {
+        this.cluster = cluster;
     }
 }

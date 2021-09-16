@@ -25,6 +25,13 @@ public class InternalVacancy {
     private Long parent;
     private Long status;
     private Long managerial;
+    @Column(name="FIELD_OF_STTUDY")
+    private String fieldOfStudy;
+    @Column(name="EDUCATION_LEVEL")
+    private String educationLevel;
+   private String location;
+   @Column(name="vps")
+   private String cluster;
 
     public Long getId() {
         return id;
@@ -112,5 +119,37 @@ public class InternalVacancy {
 
     public void setManagerial(Long managerial) {
         this.managerial = managerial;
+    }
+
+    public String getFieldOfStudy() {
+        return fieldOfStudy;
+    }
+
+    public void setFieldOfStudy(String fieldOfStudy) {
+        this.fieldOfStudy = fieldOfStudy;
+    }
+
+    public String getEducationLevel() {
+        return educationLevel;
+    }
+
+    public void setEducationLevel(String educationLevel) {
+        this.educationLevel = educationLevel;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getCluster() {
+        return cluster;
+    }
+
+    public void setCluster(String cluster) {
+        this.cluster = cluster;
     }
 }
