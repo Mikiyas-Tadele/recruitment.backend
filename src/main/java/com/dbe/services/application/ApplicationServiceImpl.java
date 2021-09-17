@@ -3,7 +3,6 @@ package com.dbe.services.application;
 import com.dbe.domain.applicant.*;
 import com.dbe.domain.internal_vacancy.*;
 import com.dbe.domain.security.UserEntity;
-import com.dbe.domain.security.VerificationToken;
 import com.dbe.repositories.applicant.*;
 import com.dbe.repositories.internal_vacancy.*;
 import com.dbe.repositories.security.UserRepository;
@@ -249,7 +248,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
         Employee  employee=employeeRepository.findByEmail(userEntity.get().getUsername());
         if(internalApplicationViewRepository.findByEmployeeId(employee.getEmployeeId()).size()==3){
             UserEntity userToDisable=userEntity.get();
-            userToDisable.setEnabled(false);
+            userToDisable.setApplied(true);
             userRepository.save(userToDisable);
             try {
                 sendConfirmationEmail(employee);
@@ -605,7 +604,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
         List<InternalApplicationView> appliedFor=internalApplicationViewRepository.findByEmployeeId(employee.getEmployeeId());
         String toAddress = employee.getEmail();
         String fromAddress = "hrm@dbe.com.et";
-        String senderName = "DBE Recruitment Team";
+        String senderName = "Placement Teams";
         String subject = "Application Confirmation";
         String content = "Dear [[name]],<br>"
          +"You have successfully applied for the positions below<br>";
@@ -615,7 +614,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
             i=i+1;
         }
                 content+= "Thank you,<br>"
-                + "Human Resource Management Directorate, <br>"
+                + "Placement Teams, <br>"
                 + "Development Bank of Ethiopia";
 
         MimeMessage message = javaMailSender.createMimeMessage();

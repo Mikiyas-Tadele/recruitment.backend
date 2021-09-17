@@ -6,8 +6,10 @@ import org.springframework.context.annotation.Configuration;
 public class StorageProperties {
     private String location = "./upload-dir";
 
+    private String prodLocation="/home/admin/Documents/ApplicationFiles";
+
     public String getLocation() {
-        return location;
+        return prodLocation;
     }
 
     public void setLocation(String location) {

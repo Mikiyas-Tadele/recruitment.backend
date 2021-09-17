@@ -3,6 +3,7 @@ package com.dbe.security.services;
 
 import com.dbe.domain.security.UserEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,6 +27,8 @@ public class UserPrinciple implements UserDetails {
 
     private Boolean staff;
 
+    private Boolean applied;
+
     @JsonIgnore
     private String password;
 
@@ -33,7 +36,7 @@ public class UserPrinciple implements UserDetails {
 
 
     public UserPrinciple(Long id, String name,
-                         String email, String password,Boolean enabled,Boolean staff,
+                         String email, String password,Boolean enabled,Boolean staff,Boolean applied,
                          Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.name = name;
@@ -42,6 +45,7 @@ public class UserPrinciple implements UserDetails {
         this.authorities = authorities;
         this.enabled=enabled;
         this.staff=staff;
+        this.applied=applied;
 
     }
 
@@ -58,6 +62,7 @@ public class UserPrinciple implements UserDetails {
                 userEntity.getPassword(),
                 userEntity.getEnabled(),
                 userEntity.getStaff(),
+                userEntity.getApplied(),
                 authorities
         );
     }
@@ -122,5 +127,13 @@ public class UserPrinciple implements UserDetails {
 
     public void setStaff(Boolean staff) {
         this.staff = staff;
+    }
+
+    public Boolean getApplied() {
+        return applied;
+    }
+
+    public void setApplied(Boolean applied) {
+        this.applied = applied;
     }
 }

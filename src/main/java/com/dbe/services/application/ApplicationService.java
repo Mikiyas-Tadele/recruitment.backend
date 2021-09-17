@@ -8,6 +8,7 @@ import com.dbe.domain.internal_vacancy.InternalApplicationView;
 import com.dbe.domain.internal_vacancy.InternalPositionByApplicantView;
 import com.dbe.services.application.model.ApplicantModel;
 import com.dbe.services.application.model.ApplicationModel;
+import com.dbe.services.application.model.MultiPartFileModel;
 import com.dbe.services.application.model.SearchModel;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,8 +22,7 @@ public interface ApplicationService {
     ApplicantModel getApplicantModel();
 
     void storeFile(MultipartFile file, Long applicationId);
-
-    void storeInternalApplicationFile(MultipartFile file,Long vacancyId);
+    void storeInternalApplicationFile(MultipartFile file, Long vacancyId);
 
     ApplicationModel applyForPosition(ApplicationModel model);
 

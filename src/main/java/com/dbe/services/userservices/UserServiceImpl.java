@@ -268,7 +268,7 @@ public class UserServiceImpl implements UserService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = jwtProvider.generateJwtToken(authentication);
-        return new JwtResponse(jwt, principal.getAuthorities(), principal.getName(), principal.getUsername(),principal.getStaff());
+        return new JwtResponse(jwt, principal.getAuthorities(), principal.getName(), principal.getUsername(),principal.getStaff(),principal.getApplied());
     }
 
     @Override
@@ -323,13 +323,13 @@ public class UserServiceImpl implements UserService {
         VerificationToken verificationToken=generateAndStoreVerificationToken(userEntity);
         String toAddress = userEntity.getUsername();
         String fromAddress = "hrm@dbe.com.et";
-        String senderName = "DBE Recruitment Team";
+        String senderName = "Placement Teams";
         String subject = "Please verify your registration";
         String content = "Dear [[name]],<br>"
                 + "Please click the link below to verify your registration:<br>"
                 + "<h4><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h4>"
                 + "Thank you,<br>"
-                + "Human Resource Management Directorate, <br>"
+                + "Placement Teams, <br>"
                 + "Development Bank of Ethiopia";
 
         MimeMessage message = javaMailSender.createMimeMessage();

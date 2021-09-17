@@ -12,13 +12,15 @@ public class JwtResponse {
     private String name;
     private String username;
     private Boolean staff;
+    private Boolean applied;
 
-    public JwtResponse(String token, Collection<? extends GrantedAuthority> authorities, String name, String username, Boolean staff) {
+    public JwtResponse(String token, Collection<? extends GrantedAuthority> authorities, String name, String username, Boolean staff,Boolean applied) {
         this.token = token;
         this.authorities = authorities;
         this.name = name;
         this.username = username;
         this.staff=staff;
+        this.applied=applied;
     }
 
     public String getAccessToken() {
@@ -68,5 +70,13 @@ public class JwtResponse {
 
     public void setStaff(Boolean staff) {
         this.staff = staff;
+    }
+
+    public Boolean getApplied() {
+        return applied;
+    }
+
+    public void setApplied(Boolean applied) {
+        this.applied = applied;
     }
 }
