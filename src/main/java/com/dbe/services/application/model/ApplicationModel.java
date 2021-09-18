@@ -4,6 +4,7 @@ public class ApplicationModel {
     private Long id;
     private String applicationLetter;
     private Long vacancyId;
+    private Long positionOrder;
 
     public String getApplicationLetter() {
         return applicationLetter;
@@ -27,5 +28,13 @@ public class ApplicationModel {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getPositionOrder() {
+        return positionOrder;
+    }
+
+    public void setPositionOrder(Long positionOrder) {
+        this.positionOrder = positionOrder;
     }
 }

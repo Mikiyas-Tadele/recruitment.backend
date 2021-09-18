@@ -16,6 +16,8 @@ public class InternalApplication {
     private Long employeeId;
     @Column(name="APPLIED_DATE")
     private Date appliedDate;
+    @Column(name="position_order")
+    private Long positionOrder;
 
     public Long getId() {
         return id;
@@ -47,5 +49,13 @@ public class InternalApplication {
 
     public void setAppliedDate(Date appliedDate) {
         this.appliedDate = appliedDate;
+    }
+
+    public Long getPositionOrder() {
+        return positionOrder;
+    }
+
+    public void setPositionOrder(Long positionOrder) {
+        this.positionOrder = positionOrder;
     }
 }

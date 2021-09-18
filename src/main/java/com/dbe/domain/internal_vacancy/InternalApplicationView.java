@@ -21,6 +21,8 @@ public class InternalApplicationView {
     private Long vacancyId;
     private Long employeeId;
     private String  appliedPosition;
+    @Column(name="POSITION_ORDER")
+    private Long positionOrder;
 
     public Long getId() {
         return id;
@@ -92,5 +94,13 @@ public class InternalApplicationView {
 
     public void setAppliedPosition(String appliedPosition) {
         this.appliedPosition = appliedPosition;
+    }
+
+    public Long getPositionOrder() {
+        return positionOrder;
+    }
+
+    public void setPositionOrder(Long positionOrder) {
+        this.positionOrder = positionOrder;
     }
 }

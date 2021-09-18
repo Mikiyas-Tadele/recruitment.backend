@@ -27,11 +27,13 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.jpa.domain.Specifications.where;
@@ -522,12 +524,14 @@ public class ApplicationServiceImpl implements  ApplicationService {
         UserPrinciple authentication= (UserPrinciple) authenticationFacade.getAuthentication().getPrincipal();
         Optional<UserEntity> userEntity= userRepository.findByUsernameAndEnabled(authentication.getUsername(),true);
         Employee employee=employeeRepository.findByEmail(userEntity.get().getUsername());
+        long i=1;
         for (Long vacancyId:ids) {
             InternalApplication internalApplication=new InternalApplication();
             InternalVacancy internalVacancy=internalVacancyRepository.findOne(vacancyId);
             internalApplication.setAppliedDate(new Date());
             internalApplication.setEmployeeId(employee.getEmployeeId());
             internalApplication.setInternalVacancy(internalVacancy);
+            internalApplication.setPositionOrder(i++);
 
             internalApplicationRepository.save(internalApplication);
         }
@@ -602,6 +606,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
     private void sendConfirmationEmail(Employee employee) throws UnsupportedEncodingException, MessagingException {
         List<InternalApplicationView> appliedFor=internalApplicationViewRepository.findByEmployeeId(employee.getEmployeeId());
+        Collections.sort(appliedFor,Comparator.comparing(InternalApplicationView::getPositionOrder));
         String toAddress = employee.getEmail();
         String fromAddress = "hrm@dbe.com.et";
         String senderName = "Placement Teams";
@@ -627,5 +632,6 @@ public class ApplicationServiceImpl implements  ApplicationService {
         helper.setText(content, true);
 
         javaMailSender.send(message);
+
     }
 }

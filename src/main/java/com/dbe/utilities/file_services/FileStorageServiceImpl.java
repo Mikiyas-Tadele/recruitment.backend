@@ -55,27 +55,24 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     @Override
     public FileModel store(MultipartFile file, FileModel fileModel) {
-        String uniqueID = UUID.randomUUID().toString();
-        String filename = uniqueID+StringUtils.cleanPath(file.getOriginalFilename());
-        fileModel.setFileName(filename);
         try {
             if (file.isEmpty()) {
-                throw new StorageException("Failed to store empty file " + filename);
+                throw new StorageException("Failed to store empty file " + fileModel.getFileName());
             }
-            if (filename.contains("..")) {
+            if (fileModel.getFileName().contains("..")) {
                 // This is a security check
                 throw new StorageException(
                         "Cannot store file with relative path outside current directory "
-                                + filename);
+                                + fileModel.getFileName());
             }
             try (InputStream inputStream = file.getInputStream()) {
-                    Files.copy(inputStream, this.rootLocation.resolve(filename),
+                    Files.copy(inputStream, this.rootLocation.resolve(fileModel.getFileName()),
                             StandardCopyOption.REPLACE_EXISTING);
                 return fileModel;
             }
         }
         catch (IOException e) {
-            throw new StorageException("Failed to store file " + filename, e);
+            throw new StorageException("Failed to store file " + fileModel.getFileName(), e);
         }
     }
 
