@@ -211,6 +211,7 @@ public class VacancyServiceImpl implements VacancyService {
         List<InternalVacancyModel> vacancyModels = new ArrayList<>();
         Iterable<InternalVacancy> internalVacancies = internalVacancyRepository.findByPlacementOfWork(placement);
         getInternalVacancyModel(vacancyModels, internalVacancies);
+        Collections.sort(vacancyModels,Comparator.comparing(InternalVacancyModel::getId));
 
         return vacancyModels;
     }

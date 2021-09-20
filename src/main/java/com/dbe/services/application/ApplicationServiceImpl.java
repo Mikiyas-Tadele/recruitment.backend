@@ -615,7 +615,8 @@ public class ApplicationServiceImpl implements  ApplicationService {
          +"You have successfully applied for the positions below<br>";
         int i=1;
         for (InternalApplicationView applicationView:appliedFor) {
-            content+="<h5>"+i+"."+applicationView.getAppliedPosition()+"</h5>";
+            String placement=applicationView.getManagerial()==0?applicationView.getPlacementOfWork():"";
+            content+="<h5>"+i+"."+applicationView.getAppliedPosition()+"-"+placement+"</h5>";
             i=i+1;
         }
                 content+= "Thank you,<br>"

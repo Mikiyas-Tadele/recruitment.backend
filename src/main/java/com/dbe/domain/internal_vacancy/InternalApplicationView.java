@@ -23,6 +23,9 @@ public class InternalApplicationView {
     private String  appliedPosition;
     @Column(name="POSITION_ORDER")
     private Long positionOrder;
+    @Column(name="PLACEMENT_OF_WORK")
+    private String placementOfWork;
+    private Long managerial;
 
     public Long getId() {
         return id;
@@ -102,5 +105,21 @@ public class InternalApplicationView {
 
     public void setPositionOrder(Long positionOrder) {
         this.positionOrder = positionOrder;
+    }
+
+    public String getPlacementOfWork() {
+        return placementOfWork;
+    }
+
+    public void setPlacementOfWork(String placementOfWork) {
+        this.placementOfWork = placementOfWork;
+    }
+
+    public Long getManagerial() {
+        return managerial;
+    }
+
+    public void setManagerial(Long managerial) {
+        this.managerial = managerial;
     }
 }
