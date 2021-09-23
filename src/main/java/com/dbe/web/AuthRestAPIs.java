@@ -80,14 +80,18 @@ public class AuthRestAPIs {
         return userService.saveRole(model);
     }
 
-    @RequestMapping("/userGivenUsername/{name}")
+    @RequestMapping("/userGivenUsername/{name:.+}")
     public UserModel getUserByUsername(@PathVariable String name){
         return userService.getUserByName(name);
     }
 
-    @RequestMapping("/reset/{username}")
-    public void resetPassword(@PathVariable String username){
-        userService.restPassword(username);
+    @RequestMapping("/reset/{id}/{key}")
+    public void resetPassword(@PathVariable String id,@PathVariable String key){
+        userService.restPassword(id,key);
+    }
+    @RequestMapping("/send-reset/{username:.+}")
+    public void sendVerification(@PathVariable String username){
+        userService.sendResetLink(username);
     }
 
 }

@@ -34,7 +34,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
              "/api/auth/register-user",
             "/api/auth/verify/{id}",
             "/api/vacancy/active-vacancies",
-            "/api/vacancy/vacancy/{id}"
+            "/api/vacancy/vacancy/{id}",
+            "/api/auth/reset/{id}/{key}",
+            "/api/auth/send-reset/{username}"
     };
 
     @Autowired

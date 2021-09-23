@@ -22,12 +22,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.management.RuntimeErrorException;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -111,12 +113,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void registerUser(UserModel userModel) {
-        if (userRepository.existsByUsername(userModel.getEmail())) {
+        if (userRepository.existsByUsername(userModel.getEmail().toLowerCase())) {
             throw new RuntimeException("Fail -> Username is already taken!");
         }
         UserEntity userEntity = new UserEntity();
         userEntity.setFullName(userModel.getFullName());
-        userEntity.setUsername(userModel.getEmail().toLowerCase());
+        userEntity.setUsername(userModel.getEmail());
         userEntity.setPassword(passwordEncoder.encode(userModel.getPassword()));
         userEntity.setEnabled(false);
         userEntity.setLastLoggedIn(new Date());
@@ -272,13 +274,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void restPassword(String username) {
-        Optional<UserEntity> userEntityOpt=userRepository.findByUsernameAndEnabled(username,true);
-        if(userEntityOpt.isPresent()){
-            UserEntity userEntity=userEntityOpt.get();
-            userEntity.setPassword(passwordEncoder.encode(SystemConstants.RESET_PASSWORD));
-
+    public void restPassword(String token,String password) {
+        VerificationToken verificationToken=verificationTokenRepository.findByToken(token);
+        if(verificationToken!=null){
+            UserEntity userEntity=verificationToken.getUserEntity();
+            userEntity.setPassword(passwordEncoder.encode(password));
             userRepository.save(userEntity);
+            verificationTokenRepository.delete(verificationToken.getId());
+            userEntity.setPassword(passwordEncoder.encode(password));
+            userRepository.save(userEntity);
+        }
+    }
+
+    @Override
+    public void sendResetLink(String username){
+        Optional<UserEntity> user=userRepository.findByUsernameAndEnabled(username,true);
+        if(user.isPresent()){
+            try {
+                sendPasswordReset(user.get());
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (MessagingException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            throw new UsernameNotFoundException("You entered an incorrect email");
         }
     }
 
@@ -348,4 +369,38 @@ public class UserServiceImpl implements UserService {
 
         javaMailSender.send(message);
     }
+
+    private void sendPasswordReset(UserEntity  userEntity) throws UnsupportedEncodingException, MessagingException {
+        VerificationToken verificationToken=generateAndStoreVerificationToken(userEntity);
+        String toAddress = userEntity.getUsername();
+        String fromAddress = "hrm@dbe.com.et";
+        String senderName = "Placement Teams";
+        String subject = "Please Reset your Password";
+        String content = "Dear [[name]],<br>"
+                + "Please click the link below to reset  your Password:<br>"
+                + "<h4><a href=\"[[URL]]\" target=\"_self\">RESET</a></h4>"
+                + "Thank you,<br>"
+                + "Placement Teams, <br>"
+                + "Development Bank of Ethiopia";
+
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+
+        helper.setFrom(fromAddress, senderName);
+        helper.setTo(toAddress);
+        helper.setSubject(subject);
+
+        content = content.replace("[[name]]", userEntity.getFullName());
+        String verifyURL = SystemConstants.PROD_RESET_URL + verificationToken.getToken();
+
+        content = content.replace("[[URL]]", verifyURL);
+
+        helper.setText(content, true);
+
+        javaMailSender.send(message);
+    }
+
+
+
+
 }

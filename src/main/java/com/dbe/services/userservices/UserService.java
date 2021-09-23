@@ -23,10 +23,11 @@ public interface UserService {
     void deleteUser(Long id);
     UserEntity authenticateUser(String username, String password);
     UserModel getUserByName(String username);
-    void restPassword(String username);
+    void restPassword(String token,String password);
 
     List<RoleModel> getRoles();
     RoleModel getRole(Long id);
     RoleModel saveRole(RoleModel model);
     JwtResponse authenticate(LoginModel loginModel);
+    void sendResetLink(String username);
 }

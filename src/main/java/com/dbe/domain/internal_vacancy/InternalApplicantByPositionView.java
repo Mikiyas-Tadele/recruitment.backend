@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Date;
 
 @Entity
 @Table(name="INTERNAL_APPLICANT_BY_POSITION",schema = "recruitmentDB")
@@ -23,6 +24,7 @@ public class InternalApplicantByPositionView {
     private Long managerial;
     private Long manageria2;
     private Long manageria3;
+    private Date appliedDate;
 
     public Long getEmployeeId() {
         return employeeId;
@@ -110,5 +112,13 @@ public class InternalApplicantByPositionView {
 
     public void setManageria3(Long manageria3) {
         this.manageria3 = manageria3;
+    }
+
+    public Date getAppliedDate() {
+        return appliedDate;
+    }
+
+    public void setAppliedDate(Date appliedDate) {
+        this.appliedDate = appliedDate;
     }
 }
