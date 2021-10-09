@@ -13,14 +13,16 @@ public class JwtResponse {
     private String username;
     private Boolean staff;
     private Boolean applied;
+    private Boolean fileError;
 
-    public JwtResponse(String token, Collection<? extends GrantedAuthority> authorities, String name, String username, Boolean staff,Boolean applied) {
+    public JwtResponse(String token, Collection<? extends GrantedAuthority> authorities, String name, String username, Boolean staff,Boolean applied,Boolean fileError) {
         this.token = token;
         this.authorities = authorities;
         this.name = name;
         this.username = username;
         this.staff=staff;
         this.applied=applied;
+        this.fileError=fileError;
     }
 
     public String getAccessToken() {
@@ -78,5 +80,13 @@ public class JwtResponse {
 
     public void setApplied(Boolean applied) {
         this.applied = applied;
+    }
+
+    public Boolean getFileError() {
+        return fileError;
+    }
+
+    public void setFileError(Boolean fileError) {
+        this.fileError = fileError;
     }
 }

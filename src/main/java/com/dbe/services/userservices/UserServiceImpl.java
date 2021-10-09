@@ -270,7 +270,7 @@ public class UserServiceImpl implements UserService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = jwtProvider.generateJwtToken(authentication);
-        return new JwtResponse(jwt, principal.getAuthorities(), principal.getName(), principal.getUsername(),principal.getStaff(),principal.getApplied());
+        return new JwtResponse(jwt, principal.getAuthorities(), principal.getName(), principal.getUsername(),principal.getStaff(),principal.getApplied(),principal.getFileError());
     }
 
     @Override
@@ -344,13 +344,13 @@ public class UserServiceImpl implements UserService {
         VerificationToken verificationToken=generateAndStoreVerificationToken(userEntity);
         String toAddress = userEntity.getUsername();
         String fromAddress = "hrm@dbe.com.et";
-        String senderName = "Placement Teams";
+        String senderName = "HR Recruitment Team";
         String subject = "Please verify your registration";
         String content = "Dear [[name]],<br>"
                 + "Please click the link below to verify your registration:<br>"
                 + "<h4><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h4>"
                 + "Thank you,<br>"
-                + "Placement Teams, <br>"
+                + "HR Recruitment Teams, <br>"
                 + "Development Bank of Ethiopia";
 
         MimeMessage message = javaMailSender.createMimeMessage();
@@ -361,7 +361,7 @@ public class UserServiceImpl implements UserService {
         helper.setSubject(subject);
 
         content = content.replace("[[name]]", userEntity.getFullName());
-        String verifyURL = SystemConstants.PROD_VERIFICATION_URL + verificationToken.getToken();
+        String verifyURL = SystemConstants.VERIFICATION_URL + verificationToken.getToken();
 
         content = content.replace("[[URL]]", verifyURL);
 
@@ -374,13 +374,13 @@ public class UserServiceImpl implements UserService {
         VerificationToken verificationToken=generateAndStoreVerificationToken(userEntity);
         String toAddress = userEntity.getUsername();
         String fromAddress = "hrm@dbe.com.et";
-        String senderName = "Placement Teams";
+        String senderName = "HR Recruitment Team";
         String subject = "Please Reset your Password";
         String content = "Dear [[name]],<br>"
                 + "Please click the link below to reset  your Password:<br>"
                 + "<h4><a href=\"[[URL]]\" target=\"_self\">RESET</a></h4>"
                 + "Thank you,<br>"
-                + "Placement Teams, <br>"
+                + "HR Recruitment Team, <br>"
                 + "Development Bank of Ethiopia";
 
         MimeMessage message = javaMailSender.createMimeMessage();

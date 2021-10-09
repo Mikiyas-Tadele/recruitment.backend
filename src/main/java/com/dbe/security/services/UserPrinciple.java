@@ -28,6 +28,7 @@ public class UserPrinciple implements UserDetails {
     private Boolean staff;
 
     private Boolean applied;
+    private Boolean fileError;
 
     @JsonIgnore
     private String password;
@@ -36,7 +37,7 @@ public class UserPrinciple implements UserDetails {
 
 
     public UserPrinciple(Long id, String name,
-                         String email, String password,Boolean enabled,Boolean staff,Boolean applied,
+                         String email, String password,Boolean enabled,Boolean staff,Boolean applied,Boolean fileError,
                          Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.name = name;
@@ -46,6 +47,7 @@ public class UserPrinciple implements UserDetails {
         this.enabled=enabled;
         this.staff=staff;
         this.applied=applied;
+        this.fileError=fileError;
 
     }
 
@@ -63,6 +65,7 @@ public class UserPrinciple implements UserDetails {
                 userEntity.getEnabled(),
                 userEntity.getStaff(),
                 userEntity.getApplied(),
+                userEntity.getFileError(),
                 authorities
         );
     }
@@ -135,5 +138,13 @@ public class UserPrinciple implements UserDetails {
 
     public void setApplied(Boolean applied) {
         this.applied = applied;
+    }
+
+    public Boolean getFileError() {
+        return fileError;
+    }
+
+    public void setFileError(Boolean fileError) {
+        this.fileError = fileError;
     }
 }

@@ -11,4 +11,7 @@ public interface InternalVacancyRepository extends CrudRepository<InternalVacanc
 
     @Query("select i from InternalVacancy i where i.placementOfWork=:pw")
     List<InternalVacancy> findByPlacementOfWork(@Param("pw") String pw);
+
+    @Query("select i from InternalVacancy i where i.status=:pw")
+    List<InternalVacancy> findActiveVacancies(@Param("pw") Long pw);
 }

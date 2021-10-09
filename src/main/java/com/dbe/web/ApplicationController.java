@@ -1,5 +1,6 @@
 package com.dbe.web;
 
+import com.dbe.domain.applicant.ApplicantForInterview;
 import com.dbe.domain.applicant.AppliedJobView;
 import com.dbe.domain.applicant.AppliedPersonelView;
 import com.dbe.domain.internal_vacancy.Employee;
@@ -7,9 +8,7 @@ import com.dbe.domain.internal_vacancy.InternalApplicantByPositionView;
 import com.dbe.domain.internal_vacancy.InternalApplicationView;
 import com.dbe.domain.internal_vacancy.InternalPositionByApplicantView;
 import com.dbe.services.application.ApplicationService;
-import com.dbe.services.application.model.ApplicantModel;
-import com.dbe.services.application.model.ApplicationModel;
-import com.dbe.services.application.model.SearchModel;
+import com.dbe.services.application.model.*;
 import com.dbe.utilities.exception.StorageException;
 import com.dbe.utilities.file_services.FileStorageService;
 import org.json.JSONObject;
@@ -21,8 +20,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.List;
 
@@ -57,6 +58,12 @@ public class ApplicationController {
     public void storeInternalApplication(@RequestParam MultipartFile file,@RequestParam Long vacancyId){
         applicationService.storeInternalApplicationFile(file,vacancyId);
     }
+
+    @RequestMapping("/internal-application-store-with-correction")
+    public void storeInternalApplicationFileWithCorrection(@RequestParam MultipartFile file,@RequestParam Long vacancyId){
+        applicationService.storeInternalApplicationWithCorrection(file,vacancyId);
+    }
+
 
     @RequestMapping("/interanal-application-closing")
     public void closeInternalApplication(){
@@ -176,4 +183,60 @@ public class ApplicationController {
     public String getFileNameToDownload(@PathVariable("vacancyId")Long vacancyId,@PathVariable("employeeId")Long employeeId){
         return JSONObject.quote(applicationService.getFileNameGivenVacancyAndEmployeeId(vacancyId,employeeId));
     }
+
+    @GetMapping("/missingfiles")
+    public void missingFile(){
+        try {
+            applicationService.sendToEmployeesWithMissingFiles();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @GetMapping("/organizeFiles")
+    public void organizeFiles(){
+        try {
+            storageService.organizeApplicationLetters();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @GetMapping("/all-applicants-for-wriiten-exam/{id}")
+    public List<ApplicantForWrittenExamModel> getAllApplicantsSelectedForWrittenExam(@PathVariable Long id){
+        return applicationService.getApplicantsForWrittenExam(id);
+    }
+
+    @GetMapping("/all-applicants-for-interview/{id}")
+    public List<ApplicantForInterviewModel> getAllApplicantsSelectedForInterview(@PathVariable Long id){
+        return applicationService.getApplicantsForInterview(id);
+    }
+
+    @PostMapping("/applicants-for-written-exam")
+    public void addOrUpdateApplicantsForWritenExam(@RequestBody List<ApplicantForWrittenExamModel> writtenExamModels){
+        applicationService.addOrUpdateApplicantsSelectedForWrittenExam(writtenExamModels);
+    }
+
+    @PostMapping("/applicants-for-interview-exam")
+    public void addOrUpdateApplicantsForInterview(@RequestBody List<ApplicantForInterviewModel> interviewModels){
+        applicationService.addOrUpdateApplicantsSelectedForInterview(interviewModels);
+    }
+
+    @GetMapping("/employeeApplicationInfo/{username:.+}")
+    public List<InternalApplicationModel> getEmployeeApplicationInfo(@PathVariable String username){
+         return applicationService.getInternalApplicationInfo(username);
+    }
+
+    @GetMapping("/deleteAttachedFile/{id}")
+    public void deleteFile(@PathVariable Long id){
+        storageService.deleteInternalFile(id);
+    }
+
+    @GetMapping("/closeFileAttachementSession")
+    public void closeFileAttachementSession(){
+        applicationService.closeFileAttachementSession();
+    }
+
 }

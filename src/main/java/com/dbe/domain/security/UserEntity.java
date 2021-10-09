@@ -22,6 +22,8 @@ public class UserEntity {
     private Date lastLoggedIn;
     private Boolean staff;
     private Boolean applied;
+    @Column(name="file_error")
+    private Boolean fileError;
     @ManyToMany(cascade = CascadeType.MERGE,fetch = FetchType.EAGER)
     @JoinTable(name="security_account_role",schema = "recruitmentDB",joinColumns = @JoinColumn(name = "user_id",referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name="role_id",referencedColumnName = "id"))
@@ -111,6 +113,14 @@ public class UserEntity {
 
     public void setApplied(Boolean applied) {
         this.applied = applied;
+    }
+
+    public Boolean getFileError() {
+        return fileError;
+    }
+
+    public void setFileError(Boolean fileError) {
+        this.fileError = fileError;
     }
 }
 

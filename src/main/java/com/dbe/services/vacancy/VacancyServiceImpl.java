@@ -200,7 +200,7 @@ public class VacancyServiceImpl implements VacancyService {
     @Override
     public List<InternalVacancyModel> getAllInternalVacancies() {
         List<InternalVacancyModel> vacancyModels = new ArrayList<>();
-        Iterable<InternalVacancy> internalVacancies = internalVacancyRepository.findAll();
+        Iterable<InternalVacancy> internalVacancies = internalVacancyRepository.findActiveVacancies(1l);
         getInternalVacancyModel(vacancyModels, internalVacancies);
 
         return vacancyModels;

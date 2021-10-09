@@ -27,13 +27,12 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.jpa.domain.Specifications.where;
@@ -93,6 +92,17 @@ public class ApplicationServiceImpl implements  ApplicationService {
     @Autowired
     JavaMailSender javaMailSender;
 
+    @Autowired
+    private EmployeeMissingFileRepository employeeMissingFileRepository;
+
+    @Autowired
+    private ApplicantForWrittenExamRepository applicantForWrittenExamRepository;
+
+    @Autowired
+    private ApplicantForInterviewRepository applicantForInterviewRepository;
+
+    @Autowired
+    private InternalFileCorrectionRepository internalFileCorrectionRepository;
 
 
     @Override
@@ -230,7 +240,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
         Optional<UserEntity> userEntity= userRepository.findByUsernameAndEnabled(authentication.getUsername(),true);
         Employee  employee=employeeRepository.findByEmail(userEntity.get().getUsername());
         FileModel fileModel = new FileModel();
-            fileModel.setFileName(StringUtils.cleanPath(file.getOriginalFilename()));
+            fileModel.setFileName(UUID.randomUUID()+StringUtils.cleanPath(file.getOriginalFilename()));
             fileModel.setFileSize(file.getSize());
             storageService.store(file, fileModel);
             InternalApplicationFile applicantFile=new InternalApplicationFile();
@@ -243,12 +253,28 @@ public class ApplicationServiceImpl implements  ApplicationService {
     }
 
     @Override
+    public void storeInternalApplicationWithCorrection(MultipartFile file, Long vacancyId) {
+        IAuthenticationFacade authenticationFacade= new AuthenticationFacade();
+        UserPrinciple authentication= (UserPrinciple) authenticationFacade.getAuthentication().getPrincipal();
+        Optional<UserEntity> userEntity= userRepository.findByUsernameAndEnabled(authentication.getUsername(),true);
+        Employee  employee=employeeRepository.findByEmail(userEntity.get().getUsername());
+        FileModel fileModel = new FileModel();
+        fileModel.setFileName(UUID.randomUUID()+StringUtils.cleanPath(file.getOriginalFilename()));
+        fileModel.setFileSize(file.getSize());
+        storageService.store(file, fileModel);
+        InternalFileCorrection applicantFile=new InternalFileCorrection();
+        applicantFile.setFileName(fileModel.getFileName());
+        applicantFile.setEmployeeId(employee.getEmployeeId());
+        applicantFile.setVacancyId(vacancyId);
+        internalFileCorrectionRepository.save(applicantFile);
+    }
+
+    @Override
     public void closeInternalApplication() {
         IAuthenticationFacade authenticationFacade= new AuthenticationFacade();
         UserPrinciple authentication= (UserPrinciple) authenticationFacade.getAuthentication().getPrincipal();
         Optional<UserEntity> userEntity= userRepository.findByUsernameAndEnabled(authentication.getUsername(),true);
         Employee  employee=employeeRepository.findByEmail(userEntity.get().getUsername());
-        if(internalApplicationViewRepository.findByEmployeeId(employee.getEmployeeId()).size()==3){
             UserEntity userToDisable=userEntity.get();
             userToDisable.setApplied(true);
             userRepository.save(userToDisable);
@@ -259,7 +285,6 @@ public class ApplicationServiceImpl implements  ApplicationService {
             } catch (MessagingException e) {
                 e.printStackTrace();
             }
-        }
 
     }
 
@@ -369,7 +394,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
         }
 
         Collections.sort(personelViewList,Comparator.comparing(AppliedPersonelView::getApplicantId));
-        return personelViewList;
+        return getFilteredApplicantProfile(personelViewList);
 
     }
 
@@ -387,6 +412,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
             appliedPersonel.setApplicantId(appliedPersonelView.getApplicantId());
             appliedPersonel.setAppliedDate(appliedPersonelView.getAppliedDate());
             if(groupedList.size()>0 && groupedList.stream().anyMatch(g->g.getApplicantId().equals(appliedPersonelView.getApplicantId()))){
+                appliedPersonel.setId(i++);
                 appliedPersonel.setFullName(null);
                 appliedPersonel.setAge(null);
                 appliedPersonel.setDisability(null);
@@ -441,15 +467,19 @@ public class ApplicationServiceImpl implements  ApplicationService {
                     appliedPersonel.setStartDate(appliedPersonelView.getStartDate());
                     appliedPersonel.setEndDate(appliedPersonelView.getEndDate());
                     if (appliedPersonelView.getStartDate() != null && appliedPersonelView.getEndDate() != null) {
-                        List<WorkExperienceDateModel> workExperienceDateModels=new ArrayList<>();
+                        List<WorkExperienceDateModel> workExperienceDateModels = new ArrayList<>();
                         Applicant applicant = applicantRepository.findOne(appliedPersonelView.getApplicantId());
-                        for (WorkExperience workExperience : applicant.getWorkExperiences()) {
-                            WorkExperienceDateModel workExperienceDateModel = new WorkExperienceDateModel();
-                            workExperienceDateModel.setStartDate(convertToLocalDateTimeViaInstant(workExperience.getStartDate()));
-                            workExperienceDateModel.setEndDate(convertToLocalDateTimeViaInstant(workExperience.getEndDate()));
-                            workExperienceDateModels.add(workExperienceDateModel);
+                        if (applicant!= null) {
+                            if(applicant.getWorkExperiences().size()>0) {
+                                for (WorkExperience workExperience : applicant.getWorkExperiences()) {
+                                    WorkExperienceDateModel workExperienceDateModel = new WorkExperienceDateModel();
+                                    workExperienceDateModel.setStartDate(convertToLocalDateTimeViaInstant(workExperience.getStartDate()));
+                                    workExperienceDateModel.setEndDate(convertToLocalDateTimeViaInstant(workExperience.getEndDate()));
+                                    workExperienceDateModels.add(workExperienceDateModel);
+                                }
+                                appliedPersonel.setTotalExperience(getTotalWorkExperience(workExperienceDateModels));
+                            }
                         }
-                        appliedPersonel.setTotalExperience(getTotalWorkExperience(workExperienceDateModels));
                     }
                 }
             }
@@ -457,7 +487,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
             groupedList.add(appliedPersonel);
         }
 
-        Collections.sort(groupedList,Comparator.comparing(AppliedPersonelView::getAppliedDate).reversed());
+        Collections.sort(groupedList,Comparator.comparing(AppliedPersonelView::getId));
 
         return groupedList;
     }
@@ -475,7 +505,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
                 .and(AppliedPersonelSpecification.graduationYearPredicate(searchModel.getGraduationYear(),searchModel.getGraduationYearCriteria())));
         Collections.sort(appliedPersonelViews,Comparator.comparing(AppliedPersonelView::getApplicantId));
 //        return getFilteredApplicantProfile(appliedPersonelViews);
-        return appliedPersonelViews;
+        return getFilteredApplicantProfile(appliedPersonelViews);
     }
 
     @Override
@@ -612,12 +642,16 @@ public class ApplicationServiceImpl implements  ApplicationService {
         String senderName = "Placement Teams";
         String subject = "Application Confirmation";
         String content = "Dear [[name]],<br>"
-         +"You have successfully applied for the positions below<br>";
+         +"You have successfully re-applied for the positions below<br>";
         int i=1;
         for (InternalApplicationView applicationView:appliedFor) {
-            String placement=applicationView.getManagerial()==0?applicationView.getPlacementOfWork():"";
-            content+="<h5>"+i+"."+applicationView.getAppliedPosition()+"-"+placement+"</h5>";
-            i=i+1;
+            LocalDate localDate=LocalDate.now();
+            LocalDate appliedDate=convertToLocalDateViaInstant(applicationView.getAppliedDate());
+            if(localDate.isEqual(appliedDate)) {
+                String placement = applicationView.getManagerial() == 0 ? applicationView.getPlacementOfWork() : "";
+                content += "<h5>" + i + "." + applicationView.getAppliedPosition() + "-" + placement + "</h5>";
+                i = i + 1;
+            }
         }
                 content+= "Thank you,<br>"
                 + "Placement Teams, <br>"
@@ -634,5 +668,156 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
         javaMailSender.send(message);
 
+    }
+
+    @Override
+    public void sendToEmployeesWithMissingFiles() throws UnsupportedEncodingException, MessagingException {
+        List<Employee> employees = employeeRepository.findAll();
+        for (Employee employee : employees) {
+            List<EmployeeMissingFile> employeeMissingFiles = employeeMissingFileRepository.findEmployees(employee.getEmployeeId());
+            if (employeeMissingFiles.size()==1) {
+                String toAddress = employee.getEmail();
+                String fromAddress = "hrm@dbe.com.et";
+                String senderName = "Placement Teams";
+                String subject = "Application Confirmation";
+                String content = "Dear [[name]],<br>"
+                        + "The motivation letter/letters received for the following position/positions is/are not readable.<br>"
+                        +"Thus, please re-send the motivation letter for the indicated position/positions up to September 30, 2021, 5:00 p.m.East Africa Time via the following email addresses:<br>" +
+                        "abebawsiraj543@gmail.com<br>" +
+                        "chernetayalew@yahoo.com<br>";
+                for (EmployeeMissingFile employeeMissingFile : employeeMissingFiles) {
+                    content+="<h5>"+employeeMissingFile.getAppliedPosition()+"</h5>";
+                }
+                content += "Thank you,<br>"
+                        + "Placement Teams, <br>"
+                        + "Development Bank of Ethiopia";
+                MimeMessage message = javaMailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(message);
+                helper.setFrom(fromAddress, senderName);
+                helper.setTo(toAddress);
+                helper.setSubject(subject);
+                content = content.replace("[[name]]", employee.getName());
+
+                helper.setText(content, true);
+
+                javaMailSender.send(message);
+            }
+        }
+    }
+
+    @Override
+    public void addOrUpdateApplicantsSelectedForWrittenExam(List<ApplicantForWrittenExamModel> applicantForWrittenExamModels) {
+        if(applicantForWrittenExamModels.size()>0) {
+            List<ApplicantForWrittenExam> applicants=new ArrayList<>();
+            for (ApplicantForWrittenExamModel writtenExamModel : applicantForWrittenExamModels) {
+                ApplicantForWrittenExam applicantForWrittenExam = writtenExamModel.getId() != null ?
+                        applicantForWrittenExamRepository.findOne(writtenExamModel.getId()) :
+                        new ApplicantForWrittenExam();
+                applicantForWrittenExam.setSelected(true);
+                applicantForWrittenExam.setExamResult(writtenExamModel.getExamResult());
+                applicantForWrittenExam.setApplicant(applicantRepository.findOne(writtenExamModel.getApplicantId()));
+                applicantForWrittenExam.setVacancy(vacancyRepository.findOne(writtenExamModel.getVacancyId()));
+
+                applicants.add(applicantForWrittenExam);
+            }
+            applicantForWrittenExamRepository.save(applicants);
+        }
+
+    }
+
+    @Override
+    public void addOrUpdateApplicantsSelectedForInterview(List<ApplicantForInterviewModel> applicantForInterviewModels) {
+        if(applicantForInterviewModels.size()>0){
+            List<ApplicantForInterview> applicants=new ArrayList<>();
+            for (ApplicantForInterviewModel interviewModel:applicantForInterviewModels) {
+                ApplicantForInterview applicantForInterview=interviewModel.getId()!=null?
+                        applicantForInterviewRepository.findOne(interviewModel.getId()):
+                        new ApplicantForInterview();
+                applicantForInterview.setSelected(true);
+                applicantForInterview.setExamResult(interviewModel.getExamResult());
+                applicantForInterview.setApplicant(applicantRepository.findOne(interviewModel.getApplicantId()));
+                applicantForInterview.setVacancy(vacancyRepository.findOne(interviewModel.getVacancyId()));
+
+                applicants.add(applicantForInterview);
+            }
+        }
+
+    }
+
+    @Override
+    public List<ApplicantForWrittenExamModel> getApplicantsForWrittenExam(Long vacancyId) {
+
+        List<ApplicantForWrittenExamModel> forWrittenExamModels =new ArrayList<>();
+        Iterable<ApplicantForWrittenExam> applicants=applicantForWrittenExamRepository.findByVacancyId(vacancyId);
+        for (ApplicantForWrittenExam applicantForWrittenExam:applicants) {
+             ApplicantForWrittenExamModel writtenExamModel=new ApplicantForWrittenExamModel();
+             writtenExamModel.setId(applicantForWrittenExam.getId());
+             writtenExamModel.setApplicantId(applicantForWrittenExam.getApplicant().getId());
+             writtenExamModel.setApplicantName(applicantForWrittenExam.getApplicant().getUserEntity().getFullName());
+             writtenExamModel.setExamResult(applicantForWrittenExam.getExamResult());
+             writtenExamModel.setSelected(applicantForWrittenExam.getSelected());
+             writtenExamModel.setVacancyId(applicantForWrittenExam.getVacancy().getId());
+             writtenExamModel.setVacancyTitle(applicantForWrittenExam.getVacancy().getTitle());
+
+            forWrittenExamModels.add(writtenExamModel);
+        }
+
+        return forWrittenExamModels;
+    }
+
+    @Override
+    public List<ApplicantForInterviewModel> getApplicantsForInterview(Long vacancyId) {
+
+        List<ApplicantForInterviewModel> forInterviewModels=new ArrayList<>();
+        Iterable<ApplicantForInterview> applicants=applicantForInterviewRepository.findByVacancyId(vacancyId);
+        for (ApplicantForInterview applicantForInterview:applicants) {
+            ApplicantForInterviewModel interviewModel=new ApplicantForInterviewModel();
+            interviewModel.setId(applicantForInterview.getId());
+            interviewModel.setApplicantId(applicantForInterview.getApplicant().getId());
+            interviewModel.setApplicantName(applicantForInterview.getApplicant().getUserEntity().getFullName());
+            interviewModel.setExamResult(applicantForInterview.getExamResult());
+            interviewModel.setVacancyId(applicantForInterview.getVacancy().getId());
+            interviewModel.setVacancyTitle(applicantForInterview.getVacancy().getTitle());
+
+            forInterviewModels.add(interviewModel);
+        }
+
+
+        return forInterviewModels;
+    }
+
+    @Override
+    public List<InternalApplicationModel> getInternalApplicationInfo(String empId) {
+        Employee employee = employeeRepository.findByEmail(empId);
+        List<InternalApplicationView> appliedFor=internalApplicationViewRepository.findByEmployeeId(employee.getEmployeeId());
+        Collections.sort(appliedFor,Comparator.comparing(InternalApplicationView::getPositionOrder));
+        List<InternalApplicationModel> applicationModels=new ArrayList<>();
+        for (InternalApplicationView file:appliedFor) {
+            InternalApplicationModel applicationModel=new InternalApplicationModel();
+            applicationModel.setEmployeeId(file.getEmployeeId());
+            applicationModel.setVacancyId(file.getVacancyId());
+            applicationModel.setPosition(internalVacancyRepository.findOne(file.getVacancyId()).getPosition());
+
+            applicationModels.add(applicationModel);
+        }
+
+        return applicationModels;
+
+    }
+
+    @Override
+    public void closeFileAttachementSession() {
+        IAuthenticationFacade authenticationFacade= new AuthenticationFacade();
+        UserPrinciple authentication= (UserPrinciple) authenticationFacade.getAuthentication().getPrincipal();
+        Optional<UserEntity> userEntity= userRepository.findByUsernameAndEnabled(authentication.getUsername(),true);
+        UserEntity userEntityValue=userEntity.get();
+        userEntityValue.setFileError(false);
+        userRepository.save(userEntityValue);
+    }
+
+    private LocalDate convertToLocalDateViaInstant(Date dateToConvert) {
+        return dateToConvert.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
     }
 }

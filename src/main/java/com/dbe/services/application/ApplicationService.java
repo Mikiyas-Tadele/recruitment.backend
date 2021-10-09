@@ -6,12 +6,11 @@ import com.dbe.domain.internal_vacancy.Employee;
 import com.dbe.domain.internal_vacancy.InternalApplicantByPositionView;
 import com.dbe.domain.internal_vacancy.InternalApplicationView;
 import com.dbe.domain.internal_vacancy.InternalPositionByApplicantView;
-import com.dbe.services.application.model.ApplicantModel;
-import com.dbe.services.application.model.ApplicationModel;
-import com.dbe.services.application.model.MultiPartFileModel;
-import com.dbe.services.application.model.SearchModel;
+import com.dbe.services.application.model.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.mail.MessagingException;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.List;
 
@@ -23,6 +22,8 @@ public interface ApplicationService {
 
     void storeFile(MultipartFile file, Long applicationId);
     void storeInternalApplicationFile(MultipartFile file, Long vacancyId);
+
+    void storeInternalApplicationWithCorrection(MultipartFile file, Long vacancyId);
 
     ApplicationModel applyForPosition(ApplicationModel model);
 
@@ -49,6 +50,20 @@ public interface ApplicationService {
     Employee getEmployeeInfo(String username);
 
     String getFileNameGivenVacancyAndEmployeeId(Long vacancyId,Long employeeId);
+
+    void sendToEmployeesWithMissingFiles() throws UnsupportedEncodingException, MessagingException;
+
+    void addOrUpdateApplicantsSelectedForWrittenExam(List<ApplicantForWrittenExamModel> applicantForWrittenExamModels);
+
+    void addOrUpdateApplicantsSelectedForInterview(List<ApplicantForInterviewModel> applicantForInterviewModels);
+
+    List<ApplicantForWrittenExamModel> getApplicantsForWrittenExam(Long vacancyId);
+
+    List<ApplicantForInterviewModel> getApplicantsForInterview(Long vacancyId);
+
+    List<InternalApplicationModel> getInternalApplicationInfo(String empId);
+
+    void closeFileAttachementSession();
 
 
 }

@@ -2,6 +2,7 @@ package com.dbe.repositories.internal_vacancy;
 
 import com.dbe.domain.internal_vacancy.InternalApplicationView;
 import com.dbe.repositories.ReadOnlyRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 

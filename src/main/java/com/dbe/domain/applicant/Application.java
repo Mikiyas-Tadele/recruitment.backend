@@ -18,7 +18,7 @@ public class Application {
     @ManyToOne
     @JoinColumn(name="vacancyId",referencedColumnName = "id")
     private Vacancy vacancy;
-    @Column(name="applied_date")
+    @Column(name="APPLIED_DATE")
     private Date appliedDate;
     private Long Status;
     private String applicationLetter;
