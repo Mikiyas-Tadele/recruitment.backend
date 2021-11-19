@@ -102,16 +102,16 @@ public class FileStorageServiceImpl implements FileStorageService {
         List<Employee> employees=employeeRepository.findAll();
         for (Employee employee:employees) {
             String fileName=employee.getName() +'_'+employee.getEmployeeId();
-            List<InternalApplicationFile> internalApplicationFiles=internalApplicationFileRepository.findbyEmployee(employee.getEmployeeId());
+            List<InternalFileCorrection> internalApplicationFiles=internalFileCorrectionRepository.findByEmployee(employee.getEmployeeId());
             if(internalApplicationFiles.size()>0){
                 Path emplyeePath=Paths.get(this.rootPath+'\\'+fileName);
                 if(!Files.exists(emplyeePath)){
                     Files.createDirectories(emplyeePath);
                 }
-                for (InternalApplicationFile iFile:internalApplicationFiles) {
+                for (InternalFileCorrection iFile:internalApplicationFiles) {
                     Path file=this.rootLocation.resolve(iFile.getFileName());
                     if(Files.exists(file)){
-                        Files.copy(file,emplyeePath.resolve(iFile.getId()+'_'+iFile.getFileName()));
+                        Files.copy(file,emplyeePath.resolve(iFile.getFileName().substring(35,iFile.getFileName().length())));
                     }
                 }
             }
@@ -131,7 +131,7 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     @Override
     public Resource loadAsResource(Long userId, Long applicationId) {
-        ApplicantFile researchFile=applicationId!=0?applicantFileRepository.findByApplicationId(applicationId):
+        ApplicantFile researchFile=applicationId!=0?applicantFileRepository.findByVacancyIdAndUserId(applicationId,userId):
                 applicantFileRepository.findByUserId(userId, SystemConstants.CV_FILE);
         return getResource(researchFile.getFileName());
     }
@@ -161,8 +161,9 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
 
     @Override
-    public void delete(Long userId, Long fileTypeId) {
-        ApplicantFile researchFile=applicantFileRepository.findByUserId(userId,fileTypeId);
+    public void delete(Long userId, Long fileTypeId, Long vacancyId) {
+        ApplicantFile researchFile= vacancyId==0?applicantFileRepository.findByUserId(userId,fileTypeId)
+                :applicantFileRepository.findByVacancyIdAndUserId(vacancyId,userId);
         try {
             Path file = rootLocation.resolve(researchFile.getFileName());
             Resource resource = new UrlResource(file.toUri());

@@ -18,12 +18,24 @@ public class InternalApplicantByPositionView {
     private String positionTwo;
     @Column(name="POSITION_THREE")
     private String positionThree;
+    @Column(name="POSITION_FOUR")
+    private String positionFour;
+    @Column(name="POSITION_FIVE")
+    private String positionFive;
+    @Column(name="POSITION_SIX")
+    private String positionSix;
     private Long vacancyId1;
     private Long vacancyId2;
     private Long vacancyId3;
+    private Long vacancyId4;
+    private Long vacancyId5;
+    private Long vacancyId6;
     private Long managerial;
     private Long manageria2;
     private Long manageria3;
+    private Long managerial4;
+    private Long managerial5;
+    private Long managerial6;
     private Date appliedDate;
 
     public Long getEmployeeId() {
@@ -120,5 +132,77 @@ public class InternalApplicantByPositionView {
 
     public void setAppliedDate(Date appliedDate) {
         this.appliedDate = appliedDate;
+    }
+
+    public String getPositionFour() {
+        return positionFour;
+    }
+
+    public void setPositionFour(String positionFour) {
+        this.positionFour = positionFour;
+    }
+
+    public String getPositionFive() {
+        return positionFive;
+    }
+
+    public void setPositionFive(String positionFive) {
+        this.positionFive = positionFive;
+    }
+
+    public String getPositionSix() {
+        return positionSix;
+    }
+
+    public void setPositionSix(String positionSix) {
+        this.positionSix = positionSix;
+    }
+
+    public Long getVacancyId4() {
+        return vacancyId4;
+    }
+
+    public void setVacancyId4(Long vacancyId4) {
+        this.vacancyId4 = vacancyId4;
+    }
+
+    public Long getVacancyId5() {
+        return vacancyId5;
+    }
+
+    public void setVacancyId5(Long vacancyId5) {
+        this.vacancyId5 = vacancyId5;
+    }
+
+    public Long getVacancyId6() {
+        return vacancyId6;
+    }
+
+    public void setVacancyId6(Long vacancyId6) {
+        this.vacancyId6 = vacancyId6;
+    }
+
+    public Long getManagerial4() {
+        return managerial4;
+    }
+
+    public void setManagerial4(Long managerial4) {
+        this.managerial4 = managerial4;
+    }
+
+    public Long getManagerial5() {
+        return managerial5;
+    }
+
+    public void setManagerial5(Long managerial5) {
+        this.managerial5 = managerial5;
+    }
+
+    public Long getManagerial6() {
+        return managerial6;
+    }
+
+    public void setManagerial6(Long managerial6) {
+        this.managerial6 = managerial6;
     }
 }

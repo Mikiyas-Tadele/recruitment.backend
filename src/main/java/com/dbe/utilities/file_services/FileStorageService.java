@@ -19,7 +19,7 @@ public interface FileStorageService {
 
     Resource loadInternalApplicantFileAsResource(Long employeeId, Long vacancyId);
 
-    void delete(Long fileId, Long fileTypeId);
+    void delete(Long fileId, Long fileTypeId, Long vacancyId);
     void deleteInternalFile(Long vacancyId);
 
     void editFileDescription(Long fileId, String description);

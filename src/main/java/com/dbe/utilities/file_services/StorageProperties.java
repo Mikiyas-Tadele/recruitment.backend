@@ -9,7 +9,7 @@ public class StorageProperties {
     private String prodLocation="/home/admin/Documents/ApplicationFiles";
 
     public String getLocation() {
-        return prodLocation;
+        return location;
     }
 
     public void setLocation(String location) {

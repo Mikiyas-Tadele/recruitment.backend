@@ -42,6 +42,7 @@ public class AppliedPersonelView {
     private String qualificationDesc;
     @Column(name="APPLIED_DATE")
     private Date appliedDate;
+    private Boolean selected;
 
     public Long getId() {
         return id;
@@ -273,5 +274,13 @@ public class AppliedPersonelView {
 
     public void setAppliedDate(Date appliedDate) {
         this.appliedDate = appliedDate;
+    }
+
+    public Boolean getSelected() {
+        return selected;
+    }
+
+    public void setSelected(Boolean selected) {
+        this.selected = selected;
     }
 }

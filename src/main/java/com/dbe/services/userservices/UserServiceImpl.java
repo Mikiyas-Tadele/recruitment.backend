@@ -361,7 +361,7 @@ public class UserServiceImpl implements UserService {
         helper.setSubject(subject);
 
         content = content.replace("[[name]]", userEntity.getFullName());
-        String verifyURL = SystemConstants.VERIFICATION_URL + verificationToken.getToken();
+        String verifyURL = SystemConstants.PROD_VERIFICATION_URL_TEST + verificationToken.getToken();
 
         content = content.replace("[[URL]]", verifyURL);
 
@@ -391,7 +391,7 @@ public class UserServiceImpl implements UserService {
         helper.setSubject(subject);
 
         content = content.replace("[[name]]", userEntity.getFullName());
-        String verifyURL = SystemConstants.PROD_RESET_URL + verificationToken.getToken();
+        String verifyURL = SystemConstants.PROD_RESET_URL_TEST + verificationToken.getToken();
 
         content = content.replace("[[URL]]", verifyURL);
 

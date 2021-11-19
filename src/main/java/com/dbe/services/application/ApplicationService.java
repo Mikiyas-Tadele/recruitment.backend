@@ -2,6 +2,7 @@ package com.dbe.services.application;
 
 import com.dbe.domain.applicant.AppliedJobView;
 import com.dbe.domain.applicant.AppliedPersonelView;
+import com.dbe.domain.applicant.FinalResultView;
 import com.dbe.domain.internal_vacancy.Employee;
 import com.dbe.domain.internal_vacancy.InternalApplicantByPositionView;
 import com.dbe.domain.internal_vacancy.InternalApplicationView;
@@ -50,12 +51,17 @@ public interface ApplicationService {
     Employee getEmployeeInfo(String username);
 
     String getFileNameGivenVacancyAndEmployeeId(Long vacancyId,Long employeeId);
+    String getFileNameGivenVacancy(Long vacancyId, Long userId);
 
     void sendToEmployeesWithMissingFiles() throws UnsupportedEncodingException, MessagingException;
 
     void addOrUpdateApplicantsSelectedForWrittenExam(List<ApplicantForWrittenExamModel> applicantForWrittenExamModels);
 
+    void removeApplicantsSelectedForWrittenExam(List<ApplicantForWrittenExamModel> applicantForWrittenExamModels);
+
     void addOrUpdateApplicantsSelectedForInterview(List<ApplicantForInterviewModel> applicantForInterviewModels);
+
+    void removeApplicantsSelectedForInterview(List<ApplicantForInterviewModel> applicantForInterviewModels);
 
     List<ApplicantForWrittenExamModel> getApplicantsForWrittenExam(Long vacancyId);
 
@@ -64,6 +70,13 @@ public interface ApplicationService {
     List<InternalApplicationModel> getInternalApplicationInfo(String empId);
 
     void closeFileAttachementSession();
+
+    void ApllicantsForResearchWithoutMsc() throws UnsupportedEncodingException, MessagingException;
+    void ApllicantsWithFileError() throws UnsupportedEncodingException, MessagingException;
+
+    List<FinalResultView> getAllApplicantsWithFinalResults(Long vacancyId);
+
+    void movetoFinalStage(List<ApplicantForInterviewModel> applicantForInterviewModels);
 
 
 }

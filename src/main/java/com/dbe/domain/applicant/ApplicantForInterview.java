@@ -20,6 +20,7 @@ public class ApplicantForInterview {
     @Column(name="exam_result")
     private Double  examResult;
     private Boolean isSelected;
+    private Boolean isFinal;
 
     public Long getId() {
         return id;
@@ -59,5 +60,13 @@ public class ApplicantForInterview {
 
     public void setSelected(Boolean selected) {
         isSelected = selected;
+    }
+
+    public Boolean getFinal() {
+        return isFinal;
+    }
+
+    public void setFinal(Boolean aFinal) {
+        isFinal = aFinal;
     }
 }

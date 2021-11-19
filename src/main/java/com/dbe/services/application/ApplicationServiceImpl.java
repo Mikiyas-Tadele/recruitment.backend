@@ -104,6 +104,12 @@ public class ApplicationServiceImpl implements  ApplicationService {
     @Autowired
     private InternalFileCorrectionRepository internalFileCorrectionRepository;
 
+    @Autowired
+    private ResearchManagerialPosWithoutMscRepository researchManagerialPosWithoutMscRepository;
+
+    @Autowired
+    private FinalResultViewRepository finalResultViewRepository;
+
 
     @Override
     public void addOrCreateApplicant(ApplicantModel applicantModel) {
@@ -214,12 +220,18 @@ public class ApplicationServiceImpl implements  ApplicationService {
         Optional<UserEntity> userEntity= userRepository.findByUsernameAndEnabled(authentication.getUsername(),true);
 
         FileModel fileModel = new FileModel();
-        fileModel.setFileName(StringUtils.cleanPath(file.getOriginalFilename()));
+        fileModel.setFileName(UUID.randomUUID()+StringUtils.cleanPath(file.getOriginalFilename()));
         fileModel.setFileSize(file.getSize());
         if(applicationId==0){
             ApplicantFile existingApplicantFile=applicantFileRepository.findByUserId(userEntity.get().getId(), SystemConstants.CV_FILE);
             if(existingApplicantFile!=null){
-                storageService.delete(userEntity.get().getId(), SystemConstants.CV_FILE);
+                storageService.delete(userEntity.get().getId(), SystemConstants.CV_FILE,0l );
+            }
+        }
+        if(applicationId!=0){
+            ApplicantFile existingApplicantFile=applicantFileRepository.findByVacancyIdAndUserId(applicationId,userEntity.get().getId());
+            if(existingApplicantFile!=null){
+                throw new ApplicationException("You have already Applied!");
             }
         }
         storageService.store(file, fileModel);
@@ -227,7 +239,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
         applicantFile.setFileName(fileModel.getFileName());
         applicantFile.setFileSize(fileModel.getFileSize());
         applicantFile.setUserEntity(userEntity.get());
-        applicantFile.setApplication(applicationRepository.findOne(applicationId));
+        applicantFile.setVacancy(vacancyRepository.findOne(applicationId));
         applicantFile.setFileType(applicationId==0?SystemConstants.CV_FILE:SystemConstants.QUALIFICATION_FILE);
 
        applicantFileRepository.save(applicantFile);
@@ -357,6 +369,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
          Application existingApplication=applicationRepository.findByApplicantAndVacancy(applicant.getId(),model.getVacancyId());
          if(existingApplication!=null){
+             storageService.delete(userEntity.get().getId(), SystemConstants.QUALIFICATION_FILE,model.getVacancyId() );
              throw new ApplicationException("You have already Applied!");
          }
 
@@ -422,6 +435,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
                 appliedPersonel.setFixedLinePhone(null);
                 appliedPersonel.setUserId(null);
                 appliedPersonel.setEmail(null);
+                appliedPersonel.setSelected(null);
             }else{
                 appliedPersonel.setId(i++);
                 appliedPersonel.setFullName(appliedPersonelView.getFullName());
@@ -435,6 +449,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
                 appliedPersonel.setEmail(appliedPersonelView.getEmail());
                 appliedPersonel.setApplicationId(appliedPersonelView.getApplicationId());
                 appliedPersonel.setApplicationLetter(appliedPersonelView.getApplicationLetter());
+                appliedPersonel.setSelected(appliedPersonelView.getSelected());
             }
 
             if(groupedList.size()>0 &&  (groupedList.stream().anyMatch(e->e.getFieldOfEducation()!=null && e.getFieldOfEducation().equals(appliedPersonelView.getFieldOfEducation())
@@ -578,16 +593,25 @@ public class ApplicationServiceImpl implements  ApplicationService {
     public List<InternalApplicantByPositionView> getApplicantsByPosition() {
          List<InternalApplicantByPositionView> applicants=internalApplicantByPositionViewRepository.findAll();
         for (InternalApplicantByPositionView applicant:applicants) {
-           if(applicant.getManageria3()!=null && applicant.getManagerial()==0){
+           if(applicant.getManagerial()!=null && applicant.getManagerial()==0){
                 applicant.setPositionOne(null);
                 applicant.setVacancyId1(null);
-            }if(applicant.getManageria3()!=null && applicant.getManageria2()==0){
+            }if(applicant.getManageria2()!=null && applicant.getManageria2()==0){
                applicant.setPositionTwo(null);
                applicant.setVacancyId2(null);
            }if(applicant.getManageria3()!=null && applicant.getManageria3()==0){
                applicant.setPositionThree(null);
                applicant.setVacancyId3(null);
-           }
+           }if(applicant.getManagerial4()!=null && applicant.getManagerial4()==0){
+                applicant.setPositionFour(null);
+                applicant.setVacancyId4(null);
+            }if(applicant.getManagerial5()!=null && applicant.getManagerial5()==0){
+                applicant.setPositionFive(null);
+                applicant.setVacancyId5(null);
+            }if(applicant.getManagerial6()!=null && applicant.getManagerial6()==0){
+                applicant.setPositionSix(null);
+                applicant.setVacancyId6(null);
+            }
 
         }
         return applicants.stream().filter(s->s.getPositionThree()!=null || s.getPositionTwo()!=null || s.getPositionOne()!=null).collect(Collectors.toList());
@@ -632,6 +656,13 @@ public class ApplicationServiceImpl implements  ApplicationService {
     @Override
     public String getFileNameGivenVacancyAndEmployeeId(Long vacancyId, Long employeeId) {
         return internalApplicationFileRepository.findbyEmployeeAndVacancy(employeeId,vacancyId).getFileName();
+    }
+
+    @Override
+    public String getFileNameGivenVacancy(Long vacancyId, Long userId) {
+        ApplicantFile applicationFile=vacancyId!=0? applicantFileRepository.findByVacancyIdAndUserId(vacancyId,userId)
+                :applicantFileRepository.findByUserId(userId,SystemConstants.CV_FILE);
+        return applicationFile.getFileName();
     }
 
     private void sendConfirmationEmail(Employee employee) throws UnsupportedEncodingException, MessagingException {
@@ -706,9 +737,71 @@ public class ApplicationServiceImpl implements  ApplicationService {
     }
 
     @Override
+    public void ApllicantsForResearchWithoutMsc() throws UnsupportedEncodingException, MessagingException {
+        List<ResearchManagerialPosWithoutMsc> withoutMscs=researchManagerialPosWithoutMscRepository.findAll();
+        for (ResearchManagerialPosWithoutMsc withoutMsc:withoutMscs) {
+            String toAddress = withoutMsc.getEmail();
+            String fromAddress = "hrm@dbe.com.et";
+            String senderName = "Placement Teams";
+            String subject = "Erroneous message";
+            String content = "Dear [[name]],<br>"
+                    + "\n"
+                    +"Due to technical issues, on October 11, 2021 you received the following erroneous message.<br>"
+            +"\"The motivation letter received for the following position/positions is not readable. <br>"
+            +"Thus, please re-send the motivation letter for the indicated position/positions up to September 30, 2021, 5:00 p.m. East Africa Time via the following email addresses:"
+            +"abebawsiraj543@gmail.com<br>"
+            +"chernetayalew@yahoo.com<br>\""
+            +"Please disregard this message, apologies for the inconvenience that might be created.<br>";
+            content += "Regards,<br>"
+                    + "Placement Teams, <br>"
+                    + "Development Bank of Ethiopia";
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
+            helper.setFrom(fromAddress, senderName);
+            helper.setTo(toAddress);
+            helper.setSubject(subject);
+            content = content.replace("[[name]]", withoutMsc.getName());
+
+            helper.setText(content, true);
+
+            javaMailSender.send(message);
+        }
+
+    }
+
+    @Override
+    public void ApllicantsWithFileError() throws UnsupportedEncodingException, MessagingException {
+        List<ResearchManagerialPosWithoutMsc> withoutMscs=researchManagerialPosWithoutMscRepository.findAll();
+        for (ResearchManagerialPosWithoutMsc withoutMsc:withoutMscs) {
+            String toAddress = withoutMsc.getEmail();
+            String fromAddress = "hrm@dbe.com.et";
+            String senderName = "Placement Teams";
+            String subject = "Regarding Motivation letter File error";
+            String content = "Dear [[name]],<br>"
+                    + "It is to be recalled that you were instructed to name and save your motivation letter by your name followed by the position you are applying for. However, you did not follow the instruction..<br>"
+                    +"You are now required to use the link (https://jobs.dbe.com.et) to re-attach your motivation letter/letters (make sure to rename each of your motivation letters using your name and the position you are applying for). Upon using the system, if you forget the password, please clink “Forgot Password” link and you will be provided a new password via you DBE email. Using the password, you will be directed to a new link to upload the motivation letter/letters..<br>";
+            content += "Thank you,<br>"
+                    + "Placement Teams, <br>"
+                    + "Development Bank of Ethiopia";
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
+            helper.setFrom(fromAddress, senderName);
+            helper.setTo(toAddress);
+            helper.setSubject(subject);
+            content = content.replace("[[name]]", withoutMsc.getName());
+
+            helper.setText(content, true);
+
+            javaMailSender.send(message);
+        }
+
+    }
+
+    @Override
     public void addOrUpdateApplicantsSelectedForWrittenExam(List<ApplicantForWrittenExamModel> applicantForWrittenExamModels) {
         if(applicantForWrittenExamModels.size()>0) {
             List<ApplicantForWrittenExam> applicants=new ArrayList<>();
+            List<Application> applications=new ArrayList<>();
             for (ApplicantForWrittenExamModel writtenExamModel : applicantForWrittenExamModels) {
                 ApplicantForWrittenExam applicantForWrittenExam = writtenExamModel.getId() != null ?
                         applicantForWrittenExamRepository.findOne(writtenExamModel.getId()) :
@@ -719,16 +812,35 @@ public class ApplicationServiceImpl implements  ApplicationService {
                 applicantForWrittenExam.setVacancy(vacancyRepository.findOne(writtenExamModel.getVacancyId()));
 
                 applicants.add(applicantForWrittenExam);
+
+                Application application=applicationRepository.findByApplicantAndVacancy(writtenExamModel.getApplicantId(),writtenExamModel.getVacancyId());
+                application.setStatus(SystemConstants.SELECTED_FOR_WRITTEN_EXAM);
+                applications.add(application);
             }
             applicantForWrittenExamRepository.save(applicants);
+            applicationRepository.save(applications);
         }
 
+    }
+
+    @Override
+    public void removeApplicantsSelectedForWrittenExam(List<ApplicantForWrittenExamModel> applicantForWrittenExamModels) {
+        if(applicantForWrittenExamModels.size()>0){
+            List<ApplicantForWrittenExam> applicants=new ArrayList<>();
+            for (ApplicantForWrittenExamModel writtenExamModel:applicantForWrittenExamModels) {
+                ApplicantForWrittenExam applicant=applicantForWrittenExamRepository.findOne(writtenExamModel.getId());
+                applicants.add(applicant);
+            }
+
+            applicantForWrittenExamRepository.delete(applicants);
+        }
     }
 
     @Override
     public void addOrUpdateApplicantsSelectedForInterview(List<ApplicantForInterviewModel> applicantForInterviewModels) {
         if(applicantForInterviewModels.size()>0){
             List<ApplicantForInterview> applicants=new ArrayList<>();
+            List<Application> applications=new ArrayList<>();
             for (ApplicantForInterviewModel interviewModel:applicantForInterviewModels) {
                 ApplicantForInterview applicantForInterview=interviewModel.getId()!=null?
                         applicantForInterviewRepository.findOne(interviewModel.getId()):
@@ -739,9 +851,29 @@ public class ApplicationServiceImpl implements  ApplicationService {
                 applicantForInterview.setVacancy(vacancyRepository.findOne(interviewModel.getVacancyId()));
 
                 applicants.add(applicantForInterview);
+
+                Application application=applicationRepository.findByApplicantAndVacancy(interviewModel.getApplicantId(),interviewModel.getVacancyId());
+                application.setStatus(SystemConstants.SELECTED_FOR_INTERVIEW);
+                applications.add(application);
             }
+
+            applicantForInterviewRepository.save(applicants);
+            applicationRepository.save(applications);
         }
 
+    }
+
+    @Override
+    public void removeApplicantsSelectedForInterview(List<ApplicantForInterviewModel> applicantForInterviewModels) {
+        if(applicantForInterviewModels.size()>0){
+            List<ApplicantForInterview> applicants=new ArrayList<>();
+            for (ApplicantForInterviewModel interviewModel:applicantForInterviewModels) {
+                ApplicantForInterview applicant=applicantForInterviewRepository.findOne(interviewModel.getId());
+                applicants.add(applicant);
+            }
+
+            applicantForInterviewRepository.delete(applicants);
+        }
     }
 
     @Override
@@ -784,6 +916,31 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
 
         return forInterviewModels;
+    }
+
+    @Override
+    public void movetoFinalStage(List<ApplicantForInterviewModel> applicantForInterviewModels) {
+        if(applicantForInterviewModels.size()>0){
+            List<ApplicantForInterview> applicants=new ArrayList<>();
+            List<Application> applications=new ArrayList<>();
+            for (ApplicantForInterviewModel interviewModel:applicantForInterviewModels) {
+                ApplicantForInterview applicantForInterview= applicantForInterviewRepository.findOne(interviewModel.getId());
+                applicantForInterview.setFinal(true);
+                applicants.add(applicantForInterview);
+
+                Application application=applicationRepository.findByApplicantAndVacancy(interviewModel.getApplicantId(),interviewModel.getVacancyId());
+                application.setStatus(SystemConstants.SELECTED_FOR_POSITION);
+                applications.add(application);
+            }
+
+            applicantForInterviewRepository.save(applicants);
+            applicationRepository.save(applications);
+        }
+    }
+
+    @Override
+    public List<FinalResultView> getAllApplicantsWithFinalResults(Long vacancyId) {
+        return finalResultViewRepository.findAll();
     }
 
     @Override

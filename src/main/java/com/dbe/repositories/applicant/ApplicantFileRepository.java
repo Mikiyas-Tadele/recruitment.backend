@@ -9,6 +9,9 @@ public interface ApplicantFileRepository extends CrudRepository<ApplicantFile,Lo
     @Query("select af from ApplicantFile af join af.userEntity u where u.id=:userId and af.fileType=:fileTypeId")
     ApplicantFile findByUserId(@Param("userId")Long userId,@Param("fileTypeId")Long fileTypeId);
 
-    @Query("select af from ApplicantFile  af join af.application a where a.id=:applicationId")
+    @Query("select af from ApplicantFile  af join af.vacancy a where a.id=:applicationId")
     ApplicantFile findByApplicationId(@Param("applicationId")Long applicationId);
+
+    @Query("select af from ApplicantFile  af  where af.vacancy.id=:applicationId and af.userEntity.id=:userId")
+    ApplicantFile findByVacancyIdAndUserId(@Param("applicationId")Long applicationId,@Param("userId")Long userId);
 }

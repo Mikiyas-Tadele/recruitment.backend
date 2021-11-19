@@ -6,7 +6,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface InternalFileCorrectionRepository  extends CrudRepository<InternalFileCorrection,Long>{
     @Query("select iv from InternalFileCorrection iv where iv.employeeId=:employeeId and iv.vacancyId=:vacancyId")
     InternalFileCorrection findbyEmployeeAndVacancy(@Param("employeeId")Long employeeId, @Param("vacancyId")Long vacancyId);
+    @Query("select iv from InternalFileCorrection iv where iv.employeeId=:employeeId")
+    List<InternalFileCorrection> findByEmployee(@Param("employeeId")Long employeeId);
 }

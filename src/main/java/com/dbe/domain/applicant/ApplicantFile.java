@@ -1,6 +1,7 @@
 package com.dbe.domain.applicant;
 
 import com.dbe.domain.security.UserEntity;
+import com.dbe.domain.vacancy.Vacancy;
 
 import javax.persistence.*;
 
@@ -19,7 +20,7 @@ public class ApplicantFile {
     private UserEntity userEntity;
     @ManyToOne
     @JoinColumn(name="applicationId",referencedColumnName = "id")
-    private Application application;
+    private Vacancy vacancy;
 
     public Long getId() {
         return id;
@@ -61,11 +62,11 @@ public class ApplicantFile {
         this.userEntity = userEntity;
     }
 
-    public Application getApplication() {
-        return application;
+    public Vacancy getVacancy() {
+        return vacancy;
     }
 
-    public void setApplication(Application application) {
-        this.application = application;
+    public void setVacancy(Vacancy vacancy) {
+        this.vacancy = vacancy;
     }
 }

@@ -1,8 +1,8 @@
 package com.dbe.web;
 
-import com.dbe.domain.applicant.ApplicantForInterview;
 import com.dbe.domain.applicant.AppliedJobView;
 import com.dbe.domain.applicant.AppliedPersonelView;
+import com.dbe.domain.applicant.FinalResultView;
 import com.dbe.domain.internal_vacancy.Employee;
 import com.dbe.domain.internal_vacancy.InternalApplicantByPositionView;
 import com.dbe.domain.internal_vacancy.InternalApplicationView;
@@ -184,10 +184,26 @@ public class ApplicationController {
         return JSONObject.quote(applicationService.getFileNameGivenVacancyAndEmployeeId(vacancyId,employeeId));
     }
 
+    @GetMapping("/fileNameToDownloadExternal/{vacancyId}/{userId}")
+    public String getFileNameToDownloadForExternalUse(@PathVariable("vacancyId")Long vacancyId,@PathVariable("userId")Long userId){
+        return JSONObject.quote(applicationService.getFileNameGivenVacancy(vacancyId,userId ));
+    }
+
     @GetMapping("/missingfiles")
     public void missingFile(){
         try {
-            applicationService.sendToEmployeesWithMissingFiles();
+            applicationService.ApllicantsForResearchWithoutMsc();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @GetMapping("/emailsToBesent")
+    public void emailsToBesent(){
+        try {
+            applicationService.ApllicantsWithFileError();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (MessagingException e) {
@@ -219,9 +235,24 @@ public class ApplicationController {
         applicationService.addOrUpdateApplicantsSelectedForWrittenExam(writtenExamModels);
     }
 
+    @PostMapping("/remove-applicants-for-written-exam")
+    public void removeApplicantsForWritenExam(@RequestBody List<ApplicantForWrittenExamModel> writtenExamModels){
+        applicationService.removeApplicantsSelectedForWrittenExam(writtenExamModels);
+    }
+
+    @PostMapping("/remove-applicants-for-interview-exam")
+    public void removeApplicantsForInterviewExam(@RequestBody List<ApplicantForInterviewModel> interviewModels){
+        applicationService.removeApplicantsSelectedForInterview(interviewModels);
+    }
+
     @PostMapping("/applicants-for-interview-exam")
     public void addOrUpdateApplicantsForInterview(@RequestBody List<ApplicantForInterviewModel> interviewModels){
         applicationService.addOrUpdateApplicantsSelectedForInterview(interviewModels);
+    }
+
+    @PostMapping("/move-applicants-to-final-stage")
+    public void moveApplicantsToFinalStage(@RequestBody List<ApplicantForInterviewModel> interviewModels){
+        applicationService.movetoFinalStage(interviewModels);
     }
 
     @GetMapping("/employeeApplicationInfo/{username:.+}")
@@ -238,5 +269,12 @@ public class ApplicationController {
     public void closeFileAttachementSession(){
         applicationService.closeFileAttachementSession();
     }
+
+    @GetMapping("/applicants-final-result/{id}")
+    public List<FinalResultView> getAllApplicantsWithFinalResult(@PathVariable Long id){
+        return applicationService.getAllApplicantsWithFinalResults(id);
+    }
+
+
 
 }
