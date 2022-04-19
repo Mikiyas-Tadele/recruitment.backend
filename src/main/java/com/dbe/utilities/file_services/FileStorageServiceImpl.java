@@ -131,9 +131,16 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     @Override
     public Resource loadAsResource(Long userId, Long applicationId) {
-        ApplicantFile researchFile=applicationId!=0?applicantFileRepository.findByVacancyIdAndUserId(applicationId,userId):
-                applicantFileRepository.findByUserId(userId, SystemConstants.CV_FILE);
-        return getResource(researchFile.getFileName());
+        if(applicationId!=0){
+            List<ApplicantFile> applicantFiles=applicantFileRepository.findByVacancyIdAndUserId(applicationId,userId);
+            if(applicantFiles.size()>0){
+                return getResource(applicantFiles.get(0).getFileName());
+            }
+        }else{
+            ApplicantFile applicantFile=applicantFileRepository.findByUserId(userId, SystemConstants.CV_FILE);
+            return getResource(applicantFile.getFileName());
+        }
+        return null;
     }
 
     @Override
@@ -162,25 +169,50 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     @Override
     public void delete(Long userId, Long fileTypeId, Long vacancyId) {
-        ApplicantFile researchFile= vacancyId==0?applicantFileRepository.findByUserId(userId,fileTypeId)
-                :applicantFileRepository.findByVacancyIdAndUserId(vacancyId,userId);
-        try {
-            Path file = rootLocation.resolve(researchFile.getFileName());
-            Resource resource = new UrlResource(file.toUri());
-            if (resource.exists() || resource.isReadable()) {
-                Files.delete(file);
-            }
-            else {
-                throw new StorageFileNotFoundException(
-                        "Could not read file: " + researchFile.getFileName());
+        if(vacancyId==0){
+            ApplicantFile researchFile=applicantFileRepository.findByUserId(userId,fileTypeId);
+            try {
+                Path file = rootLocation.resolve(researchFile.getFileName());
+                Resource resource = new UrlResource(file.toUri());
+                if (resource.exists() || resource.isReadable()) {
+                    Files.delete(file);
+                    applicantFileRepository.delete(researchFile.getId());
+                }
+                else {
+                    throw new StorageFileNotFoundException(
+                            "Could not read file: " + researchFile.getFileName());
 
+                }
+            }
+            catch (MalformedURLException e) {
+                throw new StorageFileNotFoundException("Could not read file: " + researchFile.getFileName(), e);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+           List<ApplicantFile> applicantFiles=applicantFileRepository.findByVacancyIdAndUserId(vacancyId,userId);
+            for (ApplicantFile applicantFile:applicantFiles) {
+                try {
+                    Path file = rootLocation.resolve(applicantFile.getFileName());
+                    Resource resource = new UrlResource(file.toUri());
+                    if (resource.exists() || resource.isReadable()) {
+                        Files.delete(file);
+                        applicantFileRepository.delete(applicantFile.getId());
+                    }
+                    else {
+                        throw new StorageFileNotFoundException(
+                                "Could not read file: " + applicantFile.getFileName());
+
+                    }
+                }
+                catch (MalformedURLException e) {
+                    throw new StorageFileNotFoundException("Could not read file: " + applicantFile.getFileName(), e);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
-        catch (MalformedURLException e) {
-            throw new StorageFileNotFoundException("Could not read file: " + researchFile.getFileName(), e);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 
     @Override

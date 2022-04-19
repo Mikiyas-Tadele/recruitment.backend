@@ -98,11 +98,6 @@
 			<artifactId>assertj-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.microsoft.sqlserver</groupId>
-			<artifactId>sqljdbc42</artifactId>
-			<version>4.2</version>
-		</dependency>
-		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt</artifactId>
 			<version>0.9.0</version>

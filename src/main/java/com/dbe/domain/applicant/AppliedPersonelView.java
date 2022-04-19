@@ -43,6 +43,12 @@ public class AppliedPersonelView {
     @Column(name="APPLIED_DATE")
     private Date appliedDate;
     private Boolean selected;
+    @Column(name="cert_title")
+    private String certTitle;
+    @Column(name="CERT_INSTUTION")
+    private String certInstutiion;
+    @Column(name="CERT_DATE")
+    private Date certDate;
 
     public Long getId() {
         return id;
@@ -282,5 +288,29 @@ public class AppliedPersonelView {
 
     public void setSelected(Boolean selected) {
         this.selected = selected;
+    }
+
+    public String getCertTitle() {
+        return certTitle;
+    }
+
+    public void setCertTitle(String certTitle) {
+        this.certTitle = certTitle;
+    }
+
+    public String getCertInstutiion() {
+        return certInstutiion;
+    }
+
+    public void setCertInstutiion(String certInstutiion) {
+        this.certInstutiion = certInstutiion;
+    }
+
+    public Date getCertDate() {
+        return certDate;
+    }
+
+    public void setCertDate(Date certDate) {
+        this.certDate = certDate;
     }
 }

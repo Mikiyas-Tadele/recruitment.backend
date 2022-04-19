@@ -17,7 +17,7 @@ import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*", maxAge = 1800)
 @RestController
 @RequestMapping("/api/auth")
 public class AuthRestAPIs {

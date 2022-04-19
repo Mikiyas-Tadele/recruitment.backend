@@ -110,6 +110,9 @@ public class ApplicationServiceImpl implements  ApplicationService {
     @Autowired
     private FinalResultViewRepository finalResultViewRepository;
 
+    @Autowired
+    private ShortListApplicantsRepository shortListApplicantsRepository;
+
 
     @Override
     public void addOrCreateApplicant(ApplicantModel applicantModel) {
@@ -124,6 +127,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
         applicant.setDateOfBirth(applicantModel.getDateOfBirth());
         applicant.setDisability(applicantModel.getDisability());
         applicant.setfPhone(applicantModel.getfPhone());
+        applicant.setCurrentLocation(applicantModel.getCurrentLocation());
         applicant.setmPhone1(applicantModel.getmPhone1());
         applicant.setmPhone2(applicantModel.getmPhone2());
         applicant.setGender(applicantModel.getGender());
@@ -157,6 +161,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
             applicantModel.setFirstName(applicant.getFirstName());
             applicantModel.setMiddleName(applicant.getMiddleName());
             applicantModel.setLastName(applicant.getLastName());
+            applicantModel.setCurrentLocation(applicant.getCurrentLocation());
             applicantModel.setUserId(userEntity.get().getId());
             applicantModel.setId(applicant.getId());
             applicantModel.setDisabilityDescription(applicant.getDisabilityDescription());
@@ -229,9 +234,9 @@ public class ApplicationServiceImpl implements  ApplicationService {
             }
         }
         if(applicationId!=0){
-            ApplicantFile existingApplicantFile=applicantFileRepository.findByVacancyIdAndUserId(applicationId,userEntity.get().getId());
-            if(existingApplicantFile!=null){
-                throw new ApplicationException("You have already Applied!");
+            List<ApplicantFile> existingApplicantFile=applicantFileRepository.findByVacancyIdAndUserId(applicationId,userEntity.get().getId());
+            if(existingApplicantFile!=null && existingApplicantFile.size()>0){
+                storageService.delete(userEntity.get().getId(), SystemConstants.QUALIFICATION_FILE,applicationId);
             }
         }
         storageService.store(file, fileModel);
@@ -420,6 +425,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
     private List<AppliedPersonelView> getFilteredApplicantProfile(List<AppliedPersonelView> personelViewList ){
         List<AppliedPersonelView> groupedList=new ArrayList<>();
         long i=1;
+        boolean totalExperienceNotCalculated=true;
         for (AppliedPersonelView appliedPersonelView:personelViewList) {
             AppliedPersonelView appliedPersonel=new AppliedPersonelView();
             appliedPersonel.setApplicantId(appliedPersonelView.getApplicantId());
@@ -437,6 +443,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
                 appliedPersonel.setEmail(null);
                 appliedPersonel.setSelected(null);
             }else{
+                totalExperienceNotCalculated=true;
                 appliedPersonel.setId(i++);
                 appliedPersonel.setFullName(appliedPersonelView.getFullName());
                 appliedPersonel.setAge(appliedPersonelView.getAge());
@@ -485,17 +492,19 @@ public class ApplicationServiceImpl implements  ApplicationService {
                         List<WorkExperienceDateModel> workExperienceDateModels = new ArrayList<>();
                         Applicant applicant = applicantRepository.findOne(appliedPersonelView.getApplicantId());
                         if (applicant!= null) {
-                            if(applicant.getWorkExperiences().size()>0) {
+                            if(applicant.getWorkExperiences().size()>0 && totalExperienceNotCalculated) {
                                 for (WorkExperience workExperience : applicant.getWorkExperiences()) {
                                     WorkExperienceDateModel workExperienceDateModel = new WorkExperienceDateModel();
                                     workExperienceDateModel.setStartDate(convertToLocalDateTimeViaInstant(workExperience.getStartDate()));
                                     workExperienceDateModel.setEndDate(convertToLocalDateTimeViaInstant(workExperience.getEndDate()));
                                     workExperienceDateModels.add(workExperienceDateModel);
                                 }
-                                appliedPersonel.setTotalExperience(getTotalWorkExperience(workExperienceDateModels));
+                                    appliedPersonel.setTotalExperience(getTotalWorkExperience(workExperienceDateModels));
+                                    totalExperienceNotCalculated=false;
+                                }
                             }
-                        }
                     }
+
                 }
             }
 
@@ -560,7 +569,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
 
 
-        return Math.floor(totalWorkExperience/356.0);
+        return (double) Math.round((totalWorkExperience/356.0)*100d)/100d;
     }
 
     @Override
@@ -660,9 +669,17 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
     @Override
     public String getFileNameGivenVacancy(Long vacancyId, Long userId) {
-        ApplicantFile applicationFile=vacancyId!=0? applicantFileRepository.findByVacancyIdAndUserId(vacancyId,userId)
-                :applicantFileRepository.findByUserId(userId,SystemConstants.CV_FILE);
-        return applicationFile.getFileName();
+        if(vacancyId!=0){
+            List<ApplicantFile> applicantFiles=applicantFileRepository.findByVacancyIdAndUserId(vacancyId,userId);
+            if(applicantFiles.size()>0){
+                return applicantFiles.get(0).getFileName();
+            }
+        }else{
+            ApplicantFile applicationFile=applicantFileRepository.findByUserId(userId,SystemConstants.CV_FILE);
+            return applicationFile.getFileName();
+        }
+
+        return null;
     }
 
     private void sendConfirmationEmail(Employee employee) throws UnsupportedEncodingException, MessagingException {
@@ -771,17 +788,28 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
     @Override
     public void ApllicantsWithFileError() throws UnsupportedEncodingException, MessagingException {
-        List<ResearchManagerialPosWithoutMsc> withoutMscs=researchManagerialPosWithoutMscRepository.findAll();
-        for (ResearchManagerialPosWithoutMsc withoutMsc:withoutMscs) {
+//        List<ShortListApplicants> withoutMscs=shortListApplicantsRepository.findAll();
+        for (ShortListApplicants withoutMsc:shortListApplicantsRepository.findAll()) {
             String toAddress = withoutMsc.getEmail();
-            String fromAddress = "hrm@dbe.com.et";
-            String senderName = "Placement Teams";
-            String subject = "Regarding Motivation letter File error";
-            String content = "Dear [[name]],<br>"
-                    + "It is to be recalled that you were instructed to name and save your motivation letter by your name followed by the position you are applying for. However, you did not follow the instruction..<br>"
-                    +"You are now required to use the link (https://jobs.dbe.com.et) to re-attach your motivation letter/letters (make sure to rename each of your motivation letters using your name and the position you are applying for). Upon using the system, if you forget the password, please clink “Forgot Password” link and you will be provided a new password via you DBE email. Using the password, you will be directed to a new link to upload the motivation letter/letters..<br>";
+            String fromAddress = "hrm3@dbe.com.et";
+            String senderName = "ምክትል ፕሬዚደንት ኮርፖሬት አገልግሎት";
+            String subject = "ፈተና የሚሰጥበትን ቀን ስለማሳወቅ";
+            String content = "በትግበራ ሄደት ላይ በሚገኘው አዲሱ የባንኩ መዋቅር አደረጃጀት\n" +
+                    "መሠረት ምደባ ለማካሄድ በወጣው ማስታወቂያ በሥራ መሪዎች\n" +
+                    "የሥራ መደቦች ላይ  ባመለከቱባቸው ቦታዎች ከ1-5 የወጡ\n" +
+                    "አመልካቾች እ.ኤ.አ ታህሳስ 23 ቀን 2021 ፈተና እንዲወስዱ\n" +
+                    "የተደረገ መሆኑ ይታወሳል፡፡\n" +
+                    "\n" +
+                    "በወቅቱ ፈተናውን በህመም፣ በሐዘን፣ በወሊድ እና በሌሎች አሳማኝ\n" +
+                    "ምክንያቶች ሳይወስዱ የቀሩ እንዲሁም ያቀረቡት ቅሬታ ትክክለኛ\n" +
+                    "መሆኑ በመረጋገጡ ተቀባይነት ያገኙ ሠራተኞች ፈተናውን\n" +
+                    "እንዲወስዱ ተወስኗል፡፡\n" +
+                    "\n" +
+                    "በዚሁ መሠረት ቀጥሎ በተመለከተው ዝርዝር ስማችሁ የተጠቀሰ\n" +
+                    "ተወዳዳሪዎች ሐሙስ መጋቢት 29 ቀን 2014 ዓ.ም. ከቀኑ በ7፡30\n" +
+                    "ሰዓት በአዲስ አበባ ዩኒቨርሲቲ ንግድ ሥራ ኮሌጅ ተገኝታችሁ ፈተናውን እንድትወስዱ አስታውቃለው፡፡<br><br><br>";
             content += "Thank you,<br>"
-                    + "Placement Teams, <br>"
+                    + "ምክትል ፕሬዚደንት ኮርፖሬት አገልግሎት, <br>"
                     + "Development Bank of Ethiopia";
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message);
@@ -802,6 +830,9 @@ public class ApplicationServiceImpl implements  ApplicationService {
         if(applicantForWrittenExamModels.size()>0) {
             List<ApplicantForWrittenExam> applicants=new ArrayList<>();
             List<Application> applications=new ArrayList<>();
+            int i=0;
+            List<Integer> randomNumberList=generateExamCodeNumber(applicantForWrittenExamModels.size());
+            List<ApplicantForWrittenExam> existingWrittenExamApplicants=applicantForWrittenExamRepository.findByVacancyId(applicantForWrittenExamModels.get(0).getVacancyId());
             for (ApplicantForWrittenExamModel writtenExamModel : applicantForWrittenExamModels) {
                 ApplicantForWrittenExam applicantForWrittenExam = writtenExamModel.getId() != null ?
                         applicantForWrittenExamRepository.findOne(writtenExamModel.getId()) :
@@ -810,6 +841,9 @@ public class ApplicationServiceImpl implements  ApplicationService {
                 applicantForWrittenExam.setExamResult(writtenExamModel.getExamResult());
                 applicantForWrittenExam.setApplicant(applicantRepository.findOne(writtenExamModel.getApplicantId()));
                 applicantForWrittenExam.setVacancy(vacancyRepository.findOne(writtenExamModel.getVacancyId()));
+                if(writtenExamModel.getAddOrRemove()) {
+                    applicantForWrittenExam.setExamCode(writtenExamModel.getExamCodePrefix() + randomNumberList.get(i++));
+                }
 
                 applicants.add(applicantForWrittenExam);
 
@@ -819,6 +853,9 @@ public class ApplicationServiceImpl implements  ApplicationService {
             }
             applicantForWrittenExamRepository.save(applicants);
             applicationRepository.save(applications);
+            if(existingWrittenExamApplicants.size()>0 && applicantForWrittenExamModels.get(0).getAddOrRemove()){
+                checkForExistingCode(applicantForWrittenExamModels.get(0).getVacancyId(),applicantForWrittenExamModels.get(0).getExamCodePrefix());
+            }
         }
 
     }
@@ -827,13 +864,25 @@ public class ApplicationServiceImpl implements  ApplicationService {
     public void removeApplicantsSelectedForWrittenExam(List<ApplicantForWrittenExamModel> applicantForWrittenExamModels) {
         if(applicantForWrittenExamModels.size()>0){
             List<ApplicantForWrittenExam> applicants=new ArrayList<>();
+            List<Application> applications=new ArrayList<>();
             for (ApplicantForWrittenExamModel writtenExamModel:applicantForWrittenExamModels) {
                 ApplicantForWrittenExam applicant=applicantForWrittenExamRepository.findOne(writtenExamModel.getId());
                 applicants.add(applicant);
+                Application application=applicationRepository.findByApplicantAndVacancy(writtenExamModel.getApplicantId(),writtenExamModel.getVacancyId());
+                application.setStatus(SystemConstants.NOT_SELECTED);
+                applications.add(application);
             }
 
             applicantForWrittenExamRepository.delete(applicants);
+
         }
+    }
+
+    private void changeApplicantsNotSlectedStatus(Long vacancyId){
+      List<Application> applications=applicationRepository.findByVacancyId(vacancyId);
+      List<ApplicantForWrittenExam> forWrittenExamList=applicantForWrittenExamRepository.findByVacancyId(vacancyId);
+
+
     }
 
     @Override
@@ -890,6 +939,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
              writtenExamModel.setSelected(applicantForWrittenExam.getSelected());
              writtenExamModel.setVacancyId(applicantForWrittenExam.getVacancy().getId());
              writtenExamModel.setVacancyTitle(applicantForWrittenExam.getVacancy().getTitle());
+             writtenExamModel.setExamCode(applicantForWrittenExam.getExamCode());
 
             forWrittenExamModels.add(writtenExamModel);
         }
@@ -910,6 +960,8 @@ public class ApplicationServiceImpl implements  ApplicationService {
             interviewModel.setExamResult(applicantForInterview.getExamResult());
             interviewModel.setVacancyId(applicantForInterview.getVacancy().getId());
             interviewModel.setVacancyTitle(applicantForInterview.getVacancy().getTitle());
+            interviewModel.setSelected(applicantForInterview.getSelected());
+            interviewModel.setExamCode(applicantForWrittenExamRepository.findByApplicantAndVacancyId(vacancyId,applicantForInterview.getApplicant().getId()).getExamCode());
 
             forInterviewModels.add(interviewModel);
         }
@@ -940,7 +992,7 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
     @Override
     public List<FinalResultView> getAllApplicantsWithFinalResults(Long vacancyId) {
-        return finalResultViewRepository.findAll();
+        return finalResultViewRepository.findByVacancyId(vacancyId);
     }
 
     @Override
@@ -976,5 +1028,29 @@ public class ApplicationServiceImpl implements  ApplicationService {
         return dateToConvert.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();
+    }
+
+    private void checkForExistingCode(Long vacancyId, String codePrefix){
+        List<ApplicantForWrittenExam> applicants=applicantForWrittenExamRepository.findByVacancyId(vacancyId);
+        List<ApplicantForWrittenExam> toBeSavedapplicants=new ArrayList<>();
+        List<Integer> randomNumbers=generateExamCodeNumber(applicants.size());
+        int i=0;
+        for (ApplicantForWrittenExam applicantForWrittenExam:applicants) {
+            applicantForWrittenExam.setExamCode(codePrefix+randomNumbers.get(i++));
+            toBeSavedapplicants.add(applicantForWrittenExam);
+        }
+
+        applicantForWrittenExamRepository.save(toBeSavedapplicants);
+
+    }
+
+    private  List<Integer> generateExamCodeNumber(int length) {
+        List<Integer> randomNumberList=new ArrayList<>();
+        for(int i=1;i<=length;i++){
+            randomNumberList.add(i);
+        }
+        Collections.shuffle(randomNumberList);
+
+        return randomNumberList;
     }
 }

@@ -1,14 +1,17 @@
 package com.dbe.services.vacancy;
 
+import com.dbe.domain.applicant.Application;
 import com.dbe.domain.internal_vacancy.InternalVacancy;
 import com.dbe.domain.vacancy.Vacancy;
 import com.dbe.domain.vacancy.VacancyDetail;
+import com.dbe.repositories.applicant.ApplicationRepository;
 import com.dbe.repositories.internal_vacancy.InternalVacancyRepository;
 import com.dbe.repositories.vacancyRepository.VacancyDetailRepository;
 import com.dbe.repositories.vacancyRepository.VacancyRepository;
 import com.dbe.services.vacancy.model.InternalVacancyModel;
 import com.dbe.services.vacancy.model.VacancyModel;
 import com.dbe.services.vacancy.model.VacancyModelDetail;
+import com.dbe.utilities.exception.ApplicationException;
 import com.dbe.utilities.models.SystemConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,8 @@ public class VacancyServiceImpl implements VacancyService {
     private VacancyDetailRepository vacancyDetailRepository;
     @Autowired
     private InternalVacancyRepository internalVacancyRepository;
+    @Autowired
+    private ApplicationRepository applicationRepository;
 
     @Override
     public VacancyModel addOrUpdateVacancyDetail(VacancyModel vacancyModel) {
@@ -41,7 +46,7 @@ public class VacancyServiceImpl implements VacancyService {
     public List<VacancyModel> getAllVacancies() {
 
         List<VacancyModel> models = new ArrayList<>();
-        Iterable<Vacancy> vacancies = vacancyRepository.findAll();
+        Iterable<Vacancy> vacancies = vacancyRepository.findNotDeletedVacancies(3l);
         for (Vacancy vacancy : vacancies) {
             models.add(getModelFromVacancyEntity(vacancy));
         }
@@ -74,13 +79,21 @@ public class VacancyServiceImpl implements VacancyService {
 
     @Override
     public void deleteVacancy(VacancyModel vacancyModel) {
-        vacancyRepository.delete(vacancyModel.getId());
+        Vacancy vacancy=vacancyRepository.findOne(vacancyModel.getId());
+        List<Application> applications=applicationRepository.findByVacancyId(vacancy.getId());
+        if(vacancy!=null && applications.size()==0) {
+            vacancy.setStatus(SystemConstants.DELETED_VACANCY);
+            vacancyRepository.save(vacancy);
+        }
+        else{
+            throw new ApplicationException("Vacancy can not be deleted!");
+        }
 
     }
 
 
     private Vacancy getVacancyFromModel(VacancyModel vacancyModel) {
-        Vacancy vacancy = vacancyModel != null && vacancyModel.getId() != null
+        Vacancy vacancy = (vacancyModel != null && vacancyModel.getId() != null)
                 ? vacancyRepository.findOne(vacancyModel.getId()) : new Vacancy();
         vacancy.setLocation(vacancyModel.getLocation());
         vacancy.setDeadlineDate(vacancyModel.getDeadlineDate());
@@ -93,6 +106,7 @@ public class VacancyServiceImpl implements VacancyService {
         vacancy.setRequiredNumber(vacancyModel.getRequiredNumber());
         vacancy.setSalary(vacancyModel.getSalary());
         vacancy.setSalaryDescription(vacancyModel.getSalaryDescription());
+        vacancy.setCgpa(vacancyModel.getCgpa());
 
 
         return vacancy;
@@ -112,6 +126,7 @@ public class VacancyServiceImpl implements VacancyService {
         vacancyModel.setRequiredNumber(vacancy.getRequiredNumber());
         vacancyModel.setSalary(vacancy.getSalary());
         vacancyModel.setSalaryDescription(vacancy.getSalaryDescription());
+        vacancyModel.setCgpa(vacancy.getCgpa());
         Duration duration = Duration.between(LocalDateTime.now(), convertToLocalDateTimeViaInstant(vacancy.getDeadlineDate()).plusDays(1));
         long days = duration.toDays();
         String daysLeft = "";
@@ -159,7 +174,7 @@ public class VacancyServiceImpl implements VacancyService {
             vacancyModelDetail.setDescription(vacancyDetail.getDescription());
             vacancyModelDetail.setTitle(vacancyDetail.getTitle());
             vacancyModelDetail.setVacancyId(vacancyDetail.getVacancy().getId());
-
+            vacancyModelDetail.setId(vacancyDetail.getId());
             vacancyModelDetails.add(vacancyModelDetail);
         }
 

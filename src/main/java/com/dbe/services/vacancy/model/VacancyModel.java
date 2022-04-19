@@ -19,6 +19,7 @@ public class VacancyModel {
     private String salaryDescription;
     private List<VacancyModelDetail> vacancyModelDetailList=new ArrayList<>();
     private boolean closed;
+    private String cgpa;
 
 
     public Long getId() {
@@ -131,5 +132,13 @@ public class VacancyModel {
 
     public void setSalaryDescription(String salaryDescription) {
         this.salaryDescription = salaryDescription;
+    }
+
+    public String getCgpa() {
+        return cgpa;
+    }
+
+    public void setCgpa(String cgpa) {
+        this.cgpa = cgpa;
     }
 }

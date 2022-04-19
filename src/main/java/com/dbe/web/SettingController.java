@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Created by Mikiyas on 16/03/2017.
  */
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*", maxAge = 1800)
 @RestController
 @RequestMapping(ResourceConstants.SETTING_API)
 public class SettingController {

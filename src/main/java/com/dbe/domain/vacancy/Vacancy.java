@@ -30,11 +30,12 @@ public class Vacancy {
     @Column(name="REQUIRED_NUMBER")
     private Long requiredNumber;
     private Double salary;
+    private String cgpa;
     @Column(name="SALARY_DSCRIPTION")
     private String salaryDescription;
     @OneToMany(mappedBy = "vacancy")
     private Set<Application> applications;
-    @OneToMany(mappedBy = "vacancy",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "vacancy")
     private Set<VacancyDetail> vacancyDetails = new HashSet<>();
 
     public Long getId() {
@@ -147,5 +148,13 @@ public class Vacancy {
 
     public void setSalaryDescription(String salaryDescription) {
         this.salaryDescription = salaryDescription;
+    }
+
+    public String getCgpa() {
+        return cgpa;
+    }
+
+    public void setCgpa(String cgpa) {
+        this.cgpa = cgpa;
     }
 }

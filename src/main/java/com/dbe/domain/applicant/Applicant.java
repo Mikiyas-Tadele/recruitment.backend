@@ -30,6 +30,7 @@ public class Applicant {
     private String mPhone2;
     @Column(name="fixedlinephone")
     private String fPhone;
+    private String currentLocation;
     @OneToMany(mappedBy = "applicant",cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<EducationalBackground> educationalBackgrounds = new HashSet<>();
     @OneToMany(mappedBy = "applicant",cascade = CascadeType.ALL,orphanRemoval = true)
@@ -127,6 +128,14 @@ public class Applicant {
 
     public void setfPhone(String fPhone) {
         this.fPhone = fPhone;
+    }
+
+    public String getCurrentLocation() {
+        return currentLocation;
+    }
+
+    public void setCurrentLocation(String currentLocation) {
+        this.currentLocation = currentLocation;
     }
 
     public Set<EducationalBackground> getEducationalBackgrounds() {

@@ -27,7 +27,7 @@ import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.List;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*", maxAge = 1800)
 @RestController
 @RequestMapping(ResourceConstants.APPLICATION_CONTROLLER)
 public class ApplicationController {

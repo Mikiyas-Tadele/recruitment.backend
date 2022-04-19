@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*", maxAge = 1800)
 @RestController
 @RequestMapping(ResourceConstants.VACANCY_CONTROLLER)
 public class VacancyController {
@@ -45,6 +45,11 @@ public class VacancyController {
     @GetMapping("/vacancyDetails/{vacancyId}")
     public List<VacancyModelDetail> getVacancyDetails(@PathVariable Long vacancyId){
         return vacancyService.getAllDetailsForVacancy(vacancyId);
+    }
+
+    @GetMapping("/delete-vacancyDetails/{id}")
+    public void deleteVacancyDetail(@PathVariable Long id){
+        vacancyService.deleteVacancyModelDetail(id);
     }
 
     @GetMapping("/active-vacancies")

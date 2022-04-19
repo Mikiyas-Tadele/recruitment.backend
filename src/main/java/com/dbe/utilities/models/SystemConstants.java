@@ -7,6 +7,7 @@ public interface SystemConstants {
        String PROD_VERIFICATION_URL_TEST="http://192.168.4.11:9095/recruitmentApp/verify/";
        String PROD_RESET_URL= "http://jobs.dbe.com.et/recruitmentApp/reset/";
        String PROD_RESET_URL_TEST= "http://192.168.4.11:9095/recruitmentApp/reset/";
+       String PROD_VERIFICATION_URL_DEV="http://10.48.8.21:8080/recruitmentApp/verify/";
 
        //Application File Types
        Long CV_FILE=1l;
@@ -15,6 +16,7 @@ public interface SystemConstants {
        //Vacancy Status
        Long ACTIVE_VACANCY=1l;
        Long INACTIVE_VACANCY=2l;
+       Long DELETED_VACANCY=3l;
 
        //Application Status
        Long NOT_SELECTED=10L;

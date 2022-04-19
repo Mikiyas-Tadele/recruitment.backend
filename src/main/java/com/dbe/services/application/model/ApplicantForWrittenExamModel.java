@@ -8,6 +8,10 @@ public class ApplicantForWrittenExamModel {
     private String vacancyTitle;
     private Double  examResult;
     private Boolean isSelected;
+    private String examCode;
+    private String examCodePrefix;
+    private Boolean addOrRemove;
+
 
     public Long getId() {
         return id;
@@ -63,5 +67,29 @@ public class ApplicantForWrittenExamModel {
 
     public void setSelected(Boolean selected) {
         isSelected = selected;
+    }
+
+    public String getExamCode() {
+        return examCode;
+    }
+
+    public void setExamCode(String examCode) {
+        this.examCode = examCode;
+    }
+
+    public String getExamCodePrefix() {
+        return examCodePrefix;
+    }
+
+    public void setExamCodePrefix(String examCodePrefix) {
+        this.examCodePrefix = examCodePrefix;
+    }
+
+    public Boolean getAddOrRemove() {
+        return addOrRemove;
+    }
+
+    public void setAddOrRemove(Boolean addOrRemove) {
+        this.addOrRemove = addOrRemove;
     }
 }

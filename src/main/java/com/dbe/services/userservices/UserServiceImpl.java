@@ -120,7 +120,7 @@ public class UserServiceImpl implements UserService {
         userEntity.setFullName(userModel.getFullName());
         userEntity.setUsername(userModel.getEmail());
         userEntity.setPassword(passwordEncoder.encode(userModel.getPassword()));
-        userEntity.setEnabled(false);
+        userEntity.setEnabled(true);
         userEntity.setLastLoggedIn(new Date());
         Set<Role> roles = new HashSet<>();
         Role role=new Role();
@@ -128,13 +128,13 @@ public class UserServiceImpl implements UserService {
         userEntity.setRoles(roles);
         userRepository.save(userEntity);
 
-        try {
-            sendVerificationEmail(userEntity);
-        } catch (UnsupportedEncodingException e) {
-            throw  new RuntimeException("An invalid email is entered or unable to connect to email server");
-        } catch (MessagingException e) {
-            throw  new RuntimeException("An invalid email is entered or unable to connect to email server");
-        }
+//        try {
+//            sendVerificationEmail(userEntity);
+//        } catch (UnsupportedEncodingException e) {
+//            throw  new RuntimeException("An invalid email is entered or unable to connect to email server");
+//        } catch (MessagingException e) {
+//            throw  new RuntimeException("An invalid email is entered or unable to connect to email server");
+//        }
     }
 
     private void getRolesToSave(UserModel userModel, Set<Role> roles) {
@@ -343,7 +343,8 @@ public class UserServiceImpl implements UserService {
     private void sendVerificationEmail(UserEntity  userEntity) throws UnsupportedEncodingException, MessagingException {
         VerificationToken verificationToken=generateAndStoreVerificationToken(userEntity);
         String toAddress = userEntity.getUsername();
-        String fromAddress = "hrm@dbe.com.et";
+//        String fromAddress = "hrm@dbe.com.et";
+          String fromAddress="hrmddbe@gmail.com";
         String senderName = "HR Recruitment Team";
         String subject = "Please verify your registration";
         String content = "Dear [[name]],<br>"
@@ -373,7 +374,8 @@ public class UserServiceImpl implements UserService {
     private void sendPasswordReset(UserEntity  userEntity) throws UnsupportedEncodingException, MessagingException {
         VerificationToken verificationToken=generateAndStoreVerificationToken(userEntity);
         String toAddress = userEntity.getUsername();
-        String fromAddress = "hrm@dbe.com.et";
+//        String fromAddress = "hrm@dbe.com.et";
+        String fromAddress="hrmddbe@gmail.com";
         String senderName = "HR Recruitment Team";
         String subject = "Please Reset your Password";
         String content = "Dear [[name]],<br>"

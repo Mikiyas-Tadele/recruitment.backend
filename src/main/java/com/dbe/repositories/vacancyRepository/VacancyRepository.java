@@ -11,4 +11,6 @@ import java.util.List;
 public interface VacancyRepository extends CrudRepository<Vacancy,Long> {
     @Query("select v from Vacancy v where v.status=:status ")
     List<Vacancy> findActiveVacancies(@Param("status")Long status);
+    @Query("select v from Vacancy v where v.status<>:status ")
+    List<Vacancy> findNotDeletedVacancies(@Param("status")Long status);
 }

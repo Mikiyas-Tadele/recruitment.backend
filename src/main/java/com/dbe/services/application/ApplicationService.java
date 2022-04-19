@@ -79,4 +79,6 @@ public interface ApplicationService {
     void movetoFinalStage(List<ApplicantForInterviewModel> applicantForInterviewModels);
 
 
+
+
 }

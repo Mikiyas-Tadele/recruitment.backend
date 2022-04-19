@@ -20,6 +20,8 @@ public class ApplicantForWrittenExam {
     @Column(name="exam_result")
     private Double  examResult;
     private Boolean isSelected;
+    @Column(name="EXAM_CODE")
+    private String examCode;
 
     public Long getId() {
         return id;
@@ -59,5 +61,13 @@ public class ApplicantForWrittenExam {
 
     public void setSelected(Boolean selected) {
         isSelected = selected;
+    }
+
+    public String getExamCode() {
+        return examCode;
+    }
+
+    public void setExamCode(String examCode) {
+        this.examCode = examCode;
     }
 }

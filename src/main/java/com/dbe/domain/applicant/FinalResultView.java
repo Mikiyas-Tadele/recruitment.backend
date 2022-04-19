@@ -19,6 +19,8 @@ public class FinalResultView {
     @Column(name="total_result")
     private Double totalResult;
     private Long vacancyId;
+    @Column(name="exam_code")
+    private String examCode;
 
     public Long getId() {
         return id;
@@ -66,5 +68,13 @@ public class FinalResultView {
 
     public void setVacancyId(Long vacancyId) {
         this.vacancyId = vacancyId;
+    }
+
+    public String getExamCode() {
+        return examCode;
+    }
+
+    public void setExamCode(String examCode) {
+        this.examCode = examCode;
     }
 }

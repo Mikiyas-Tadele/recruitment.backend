@@ -18,6 +18,7 @@ public class ApplicantModel {
     private String mPhone1;
     private String mPhone2;
     private String fPhone;
+    private String currentLocation;
     private String disabilityDescription;
     private List<EducationalBackgroundModel> educationalBackgrounds=new ArrayList<>();
     private List<WorkExperienceModel> workExperiences=new ArrayList<>();
@@ -117,6 +118,14 @@ public class ApplicantModel {
 
     public void setfPhone(String fPhone) {
         this.fPhone = fPhone;
+    }
+
+    public String getCurrentLocation() {
+        return currentLocation;
+    }
+
+    public void setCurrentLocation(String currentLocation) {
+        this.currentLocation = currentLocation;
     }
 
     public List<EducationalBackgroundModel> getEducationalBackgrounds() {

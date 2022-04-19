@@ -8,6 +8,7 @@ public class ApplicantForInterviewModel {
     private String vacancyTitle;
     private Double  examResult;
     private Boolean isSelected;
+    private String examCode;
 
     public Long getId() {
         return id;
@@ -63,5 +64,13 @@ public class ApplicantForInterviewModel {
 
     public void setSelected(Boolean selected) {
         isSelected = selected;
+    }
+
+    public String getExamCode() {
+        return examCode;
+    }
+
+    public void setExamCode(String examCode) {
+        this.examCode = examCode;
     }
 }
