@@ -460,7 +460,8 @@ public class ApplicationServiceImpl implements  ApplicationService {
             }
 
             if(groupedList.size()>0 &&  (groupedList.stream().anyMatch(e->e.getFieldOfEducation()!=null && e.getFieldOfEducation().equals(appliedPersonelView.getFieldOfEducation())
-                    && e.getYearOfGraduation()!=null && e.getYearOfGraduation().equals(appliedPersonelView.getYearOfGraduation())))){
+                    && e.getYearOfGraduation()!=null && e.getYearOfGraduation().equals(appliedPersonelView.getYearOfGraduation())
+                    && e.getApplicantId()!=null && e.getApplicantId().equals(appliedPersonelView.getApplicantId())))){
                 appliedPersonel.setFieldOfEducation(null);
                 appliedPersonel.setYearOfGraduation(null);
                 appliedPersonel.setCgpa(null);
@@ -475,7 +476,8 @@ public class ApplicationServiceImpl implements  ApplicationService {
             }
             if(appliedPersonelView.getOrganization()!=null && appliedPersonelView.getPosition()!=null) {
                 if (groupedList.size() > 0 && groupedList.stream().anyMatch(e -> e.getOrganization() !=null && e.getOrganization().equals(appliedPersonelView.getOrganization())
-                        && e.getPosition()!=null && e.getPosition().equals(appliedPersonelView.getPosition()))) {
+                        && e.getPosition()!=null && e.getPosition().equals(appliedPersonelView.getPosition())
+                        && e.getApplicantId()!=null && e.getApplicantId().equals(appliedPersonelView.getApplicantId()))) {
                     appliedPersonel.setOrganization(null);
                     appliedPersonel.setPosition(null);
                     appliedPersonel.setSalary(null);
@@ -507,6 +509,18 @@ public class ApplicationServiceImpl implements  ApplicationService {
 
                 }
             }
+                if(groupedList.size()>0 &&  (groupedList.stream().anyMatch(e->e.getCertTitle()!=null && e.getCertTitle().equals(appliedPersonelView.getCertTitle())
+                        && e.getCertInstutiion()!=null && e.getCertInstutiion().equals(appliedPersonelView.getCertInstutiion())
+                        && e.getApplicantId()!=null && e.getApplicantId().equals(appliedPersonelView.getApplicantId())))){
+                    appliedPersonel.setCertTitle(null);
+                    appliedPersonel.setCertInstutiion(null);
+                    appliedPersonel.setCertDate(null);
+                }else{
+                    appliedPersonel.setCertTitle(appliedPersonelView.getCertTitle());
+                    appliedPersonel.setCertInstutiion(appliedPersonelView.getCertInstutiion());
+                    appliedPersonel.setCertDate(appliedPersonelView.getCertDate());
+                }
+
 
             groupedList.add(appliedPersonel);
         }
